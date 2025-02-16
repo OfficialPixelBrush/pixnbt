@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+/build
+/world
+/_CPack_Packages
+*.gz
+*.properties
+*.cnk
+
+# Language Server
+.cache
