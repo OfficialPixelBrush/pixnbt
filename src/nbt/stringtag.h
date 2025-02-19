@@ -5,5 +5,8 @@ class StringTag : public Tag {
     private:
         std::string data = "";
     public:
-        StringTag(std::string name, std::string data = "") : Tag(name){this->data = data; }
+        StringTag(std::string name, std::string data = "") : Tag(name){ this->data = data; }
+        void PrintData() override {
+            std::cout << data;
+        }
 };

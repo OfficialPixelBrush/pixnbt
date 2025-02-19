@@ -6,7 +6,7 @@ Tag::Tag(std::string name) {
 
 std::shared_ptr<Tag> Tag::SetName(std::string name) {
     this->name = name;
-    return std::make_unique<Tag>(*this);
+    return std::make_shared<Tag>(*this);
 }
 
 std::string Tag::GetName() {

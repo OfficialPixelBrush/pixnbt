@@ -41,4 +41,7 @@ class CompoundTag : public Tag {
         
             return nullptr;
         }
+        void PrintData() override {
+            std::cout << tags.size();
+        }
 };

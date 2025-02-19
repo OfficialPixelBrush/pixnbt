@@ -20,7 +20,7 @@ enum Tags {
 };
 
 class Tag {
-    private: 
+    private:
         std::string name = "";
     public:
         virtual ~Tag() = default;  
@@ -53,8 +53,7 @@ class Tag {
                     return "TAG_Compound";
             }
             return "UNKNOWN";
-        }
-        */
+        }*/
         void Write(std::ofstream stream);
         void Read(std::ifstream stream);
 
@@ -62,4 +61,7 @@ class Tag {
         void WriteNamedTag(Tag tag, std::ofstream stream);
         std::shared_ptr<Tag> SetName(std::string name);
         std::string GetName();
+        virtual void PrintData() {
+            std::cout << "RAW";
+        };
 };
