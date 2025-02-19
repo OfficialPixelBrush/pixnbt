@@ -18,6 +18,10 @@ class CompoundTag : public Tag {
             tags[name] = value->SetName(name);
         }
 
+        std::unordered_map<std::string, Tag*> GetTags() {
+            return tags;
+        }
+
         StringTag* GetString(const std::string& name) {
             auto it = tags.find(name);
             if (it != tags.end()) {
