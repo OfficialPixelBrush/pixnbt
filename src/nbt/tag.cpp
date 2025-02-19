@@ -4,9 +4,9 @@ Tag::Tag(std::string name) {
     this->name = name;
 }
 
-Tag* Tag::SetName(std::string name) {
+std::shared_ptr<Tag> Tag::SetName(std::string name) {
     this->name = name;
-    return this;
+    return std::make_unique<Tag>(*this);
 }
 
 std::string Tag::GetName() {

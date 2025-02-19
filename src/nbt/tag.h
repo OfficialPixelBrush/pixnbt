@@ -2,6 +2,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include <memory>
 
 enum Tags {
     TAG_END         =  0,
@@ -22,6 +23,7 @@ class Tag {
     private: 
         std::string name = "";
     public:
+        virtual ~Tag() = default;  
         Tag(std::string name = "");
         std::string GetTagName(int8_t type);
         /*
@@ -56,8 +58,8 @@ class Tag {
         void Write(std::ofstream stream);
         void Read(std::ifstream stream);
 
-        Tag* ReadNamedTag(std::ifstream stream);
+        std::shared_ptr<Tag> ReadNamedTag(std::ifstream stream);
         void WriteNamedTag(Tag tag, std::ofstream stream);
-        Tag* SetName(std::string name);
+        std::shared_ptr<Tag> SetName(std::string name);
         std::string GetName();
 };
