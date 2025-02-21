@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 #include <cstring>
+#include <arpa/inet.h>
 
 enum Tags {
     TAG_END         =  0,
@@ -40,9 +41,11 @@ class Tag {
         Tag* SetName(std::string name);
         std::string GetName();
         void WriteHeader(std::ofstream& stream) {
-            stream << GetTagId() << (uint8_t)(name.size() & 0xFF) << (uint8_t)(name.size() >> 8 & 0xFF) << name;
+            stream << GetTagId();
+            uint16_t nameSize = htons(static_cast<uint16_t>(name.size())); // Convert size to big-endian
+            stream.write(reinterpret_cast<const char*>(&nameSize), sizeof(nameSize)); // Write swapped size
+            stream << name;
         };
-
         virtual void PrintData() {
             std::cout << "(Tag) " << GetName() << ": " << "RAW" << std::endl;
         };
