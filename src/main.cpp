@@ -1,8 +1,7 @@
-#include <iostream>
-#include <vector>
 #include "nbt/nbt.h"
 
 int main() {
+	/*
 	auto root = std::make_shared<CompoundTag>("ROOT");
 	auto ctag = std::make_shared<CompoundTag>("Test");
 	auto stag = std::make_shared<StringTag>("Name", "PixelBrushArt");
@@ -31,5 +30,20 @@ int main() {
 	root->PrintData();
 	//auto allRootTags = root->GetTags();
 	auto allTags = ctag->GetTags();
+	*/
+
+	// player.nbt
+	auto root = std::make_shared<CompoundTag>("");
+	auto motionList = std::make_shared<ListTag>("Motion");
+	auto motionX = std::make_shared<DoubleTag>("x",-66.0);
+	auto motionY = std::make_shared<DoubleTag>("y",234234.15);
+	auto motionZ = std::make_shared<DoubleTag>("z",-3125.634);
+	motionList->Put(motionX);
+	motionList->Put(motionY);
+	motionList->Put(motionZ);
+	root->Put(motionList);
+    std::ofstream file ("file.nbt");
+	root->Write(file,true);
+	file.close();
 	return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
-#include "stringtag.h"
 #include "compoundtag.h"
+#include "listtag.h"
+#include "stringtag.h"
 #include "bytetag.h"
 #include "shorttag.h"
 #include "inttag.h"

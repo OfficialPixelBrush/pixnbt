@@ -9,4 +9,13 @@ class DoubleTag : public Tag {
         void PrintData() override {
             std::cout << "(Double) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
         }
+        uint8_t GetTagId() override {
+            return (uint8_t)TAG_DOUBLE;
+        }
+        void Write(std::ofstream& stream, bool primary = true) override {
+            if (primary) {
+                WriteHeader(stream);
+            }
+            stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+        }
 };
