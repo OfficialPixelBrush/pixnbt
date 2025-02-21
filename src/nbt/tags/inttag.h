@@ -16,6 +16,7 @@ class IntTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+            uint32_t writtenData = Swap32(data);
+            stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
 };

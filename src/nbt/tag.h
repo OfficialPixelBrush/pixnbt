@@ -1,12 +1,14 @@
 #pragma once
+
+#include <libdeflate.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <memory>
-#include <unordered_map>
 #include <vector>
 #include <cstring>
-#include <arpa/inet.h>
+#include <algorithm>
+#include "endian.h"
 
 enum Tags {
     TAG_END         =  0,
@@ -42,7 +44,7 @@ class Tag {
         std::string GetName();
         void WriteHeader(std::ofstream& stream) {
             stream << GetTagId();
-            uint16_t nameSize = htons(static_cast<uint16_t>(name.size())); // Convert size to big-endian
+            uint16_t nameSize = Swap16(static_cast<uint16_t>(name.size())); // Convert size to big-endian
             stream.write(reinterpret_cast<const char*>(&nameSize), sizeof(nameSize)); // Write swapped size
             stream << name;
         };

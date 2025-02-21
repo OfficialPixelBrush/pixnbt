@@ -16,6 +16,7 @@ class ShortTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+            uint16_t writtenData = Swap16(data);
+            stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
 };

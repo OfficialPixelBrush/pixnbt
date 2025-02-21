@@ -16,6 +16,8 @@ class FloatTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+            uint32_t writtenData = *reinterpret_cast<uint32_t*>(&data);
+            writtenData = Swap32(writtenData);  // Swap bytes if needed
+            stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
 };

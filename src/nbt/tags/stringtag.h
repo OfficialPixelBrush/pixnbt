@@ -16,6 +16,6 @@ class StringTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            stream << data.size() << data;
+            stream << Swap16(data.size()) << data;
         }
 };

@@ -16,6 +16,7 @@ class LongTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+            uint64_t writtenData = Swap64(data);
+            stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
 };

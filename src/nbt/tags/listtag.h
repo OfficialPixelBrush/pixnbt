@@ -43,12 +43,14 @@ class ListTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
+            stream << (uint8_t)tagType;
+            uint32_t writtenSize = Swap32(tags.size());
+            stream.write(reinterpret_cast<const char*>(&writtenSize), sizeof(writtenSize));
             for (size_t i = 0; i < tags.size(); ++i) {
-                if (i == 0) {
-                    stream << (uint8_t)tagType;
+                // TODO: Can sometimes use-after-free??
+                if (tags[i]) {
+                    tags[i]->Write(stream,false);
                 }
-                tags[i]->Write(stream,false);
             }
-            stream << (uint8_t)TAG_END;
         }
 };

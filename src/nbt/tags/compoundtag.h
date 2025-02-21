@@ -4,34 +4,36 @@
 
 class CompoundTag : public Tag {
     private:
-        std::unordered_map<std::string, Tag*> tags;
+        std::vector<Tag*> tags;
     public:
         CompoundTag(std::string name) : Tag(name){};
 
         // TODO: Check if a tag of the same name already exists?
         void Put(const std::string& name, std::shared_ptr<Tag> tag) {
-            tags[name] = tag->SetName(name);
+            tags.push_back(tag->SetName(name));
         }
 
         void Put(std::shared_ptr<Tag> tag) {
-            tags[tag->GetName()] = tag.get();
+            tags.push_back(tag.get());
         }
 
-        std::unordered_map<std::string, Tag*> GetTags() {
+        std::vector<Tag*> GetTags() {
             return tags;
         }
 
         Tag* Get(const std::string& name) {
-            auto it = tags.find(name);
-            if (it == tags.end()) return nullptr;        
-            return it->second;
+            auto it = std::find_if(tags.begin(), tags.end(),
+                [&](Tag* tag) { return tag->GetName() == name; });
+
+            if (it == tags.end()) return nullptr;
+            return *it;
         }
 
         void PrintData() override {
             std::cout << "(Compound) " << GetName() << ": " << tags.size() << std::endl;
             for (const auto& t : tags) {
                 std::cout << "\t";
-                t.second->PrintData();
+                t->PrintData();
             }
         }
         uint8_t GetTagId() override {
@@ -42,7 +44,7 @@ class CompoundTag : public Tag {
                 WriteHeader(stream);
             }
             for (const auto& t : tags) {
-                t.second->Write(stream);
+                t->Write(stream);
             }
             stream << (uint8_t)TAG_END;
         }

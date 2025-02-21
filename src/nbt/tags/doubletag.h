@@ -16,6 +16,8 @@ class DoubleTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+            uint64_t writtenData = *reinterpret_cast<uint64_t*>(&data);
+            writtenData = Swap64(writtenData);  // Swap bytes if needed
+            stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
 };
