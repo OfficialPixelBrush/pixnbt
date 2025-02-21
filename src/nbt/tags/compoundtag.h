@@ -14,6 +14,10 @@ class CompoundTag : public Tag {
             tags[name] = tag->SetName(name);
         }
 
+        void Put(std::shared_ptr<Tag> tag) {
+            tags[tag->GetName()] = tag.get();
+        }
+
         std::unordered_map<std::string, Tag*> GetTags() {
             return tags;
         }
@@ -42,6 +46,10 @@ class CompoundTag : public Tag {
             return nullptr;
         }
         void PrintData() override {
-            std::cout << GetName() << ": " << tags.size() << std::endl;
+            std::cout << "(Compound) " << GetName() << ": " << tags.size() << std::endl;
+            for (const auto& t : tags) {
+                std::cout << "\t";
+                t.second->PrintData();
+            }
         }
 };
