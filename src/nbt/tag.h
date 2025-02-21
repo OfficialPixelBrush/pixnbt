@@ -57,11 +57,11 @@ class Tag {
         void Write(std::ofstream stream);
         void Read(std::ifstream stream);
 
-        std::shared_ptr<Tag> ReadNamedTag(std::ifstream stream);
+        Tag* ReadNamedTag(std::ifstream stream);
         void WriteNamedTag(Tag tag, std::ofstream stream);
-        std::shared_ptr<Tag> SetName(std::string name);
+        Tag* SetName(std::string name);
         std::string GetName();
         virtual void PrintData() {
-            std::cout << "RAW";
+            std::cout << this->name << ": " << "RAW" << std::endl;
         };
 };

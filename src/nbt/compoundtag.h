@@ -5,7 +5,7 @@
 
 class CompoundTag : public Tag {
     private:
-        std::unordered_map<std::string, std::shared_ptr<Tag>> tags;
+        std::unordered_map<std::string, Tag*> tags;
     public:
         std::string data;
         CompoundTag(std::string name) : Tag(name){};
@@ -14,7 +14,7 @@ class CompoundTag : public Tag {
             tags[name] = tag->SetName(name);
         }
 
-        std::unordered_map<std::string, std::shared_ptr<Tag>> GetTags() {
+        std::unordered_map<std::string, Tag*> GetTags() {
             return tags;
         }
 
@@ -23,7 +23,7 @@ class CompoundTag : public Tag {
             if (it == tags.end()) return nullptr;
         
             // Cast the raw pointer from the unique_ptr
-            if (auto* ptr = dynamic_cast<StringTag*>(it->second.get())) {
+            if (auto* ptr = dynamic_cast<StringTag*>(it->second)) {
                 return std::make_shared<StringTag>(*ptr);  // Create a new unique_ptr with a copy
             }
         
@@ -35,13 +35,13 @@ class CompoundTag : public Tag {
             if (it == tags.end()) return nullptr;
         
             // Cast the raw pointer from the unique_ptr
-            if (auto* ptr = dynamic_cast<CompoundTag*>(it->second.get())) {
+            if (auto* ptr = dynamic_cast<CompoundTag*>(it->second)) {
                 return std::make_shared<CompoundTag>(*ptr);  // Create a new unique_ptr with a copy
             }
         
             return nullptr;
         }
         void PrintData() override {
-            std::cout << tags.size();
+            std::cout << GetName() << ": " << tags.size() << std::endl;
         }
 };
