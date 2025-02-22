@@ -42,11 +42,11 @@ int main() {
 	inventory->Put(NbtItem(1, 7,64,0));
 
 	// Yeet to file
-	NbtWriteToFile("player.dat",root);
-	std::cout << "--- Written ---" << std::endl;
-	root->NbtPrintData();
+	//NbtWriteToFile("player.dat",root);
+	//std::cout << "--- Written ---" << std::endl;
+	//root->NbtPrintData();
 
-	auto readRoot = NbtReadFromFile("player.dat");
+	auto readRoot = NbtReadFromFile("PixelBrushArt.dat");
 	std::cout << "--- Read ---" << std::endl;
 	readRoot->NbtPrintData();
 

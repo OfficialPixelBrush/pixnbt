@@ -122,3 +122,14 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed) {
     }
     return root;
 }
+
+int8_t NbtConvertToSlot(int8_t slot) {
+    // shift to hotbar
+    if (slot >= 36) {
+        return slot - 36;
+    }
+    // shift to rest(?)
+    if (slot <= 8) {
+        return slot + 35;
+    }
+}
