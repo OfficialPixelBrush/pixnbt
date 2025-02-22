@@ -23,7 +23,7 @@ class Tag {
         virtual uint8_t GetTagId() = 0;
         virtual void Write(std::ostringstream& stream, bool primary = true) = 0;
         virtual void Read(std::istringstream& stream) = 0;
-        virtual void PrintData() {
+        virtual void NbtPrintData() {
             std::cout << "(Tag) " << GetName() << ": " << "RAW" << std::endl;
         };
         Tag(std::string name = "") { this->name = name; }

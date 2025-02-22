@@ -6,7 +6,7 @@ class IntTag : public Tag {
     int32_t data = 0;
     public:
         IntTag(std::string name, int32_t data = 0) : Tag(name){ this->data = data; }
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(Int) " << GetName() << ": " << (int)data << std::endl;
         }
         uint8_t GetTagId() override {

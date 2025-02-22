@@ -29,11 +29,11 @@ class CompoundTag : public Tag {
             return *it; // Return the shared_ptr<Tag>
         }
 
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(Compound) " << GetName() << ": " << tags.size() << std::endl;
             for (const auto& t : tags) {
                 std::cout << "\t";
-                t->PrintData();
+                t->NbtPrintData();
             }
         }
         uint8_t GetTagId() override {

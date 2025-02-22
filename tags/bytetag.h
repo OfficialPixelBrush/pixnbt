@@ -6,7 +6,7 @@ class ByteTag : public Tag {
         int8_t data = 0;
     public:
         ByteTag(std::string name, int8_t data = 0) : Tag(name){ this->data = data; }
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(Byte) " << GetName() << ": " << (int)data << std::endl;
         }
         uint8_t GetTagId() override {

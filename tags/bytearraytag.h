@@ -7,7 +7,7 @@ class ByteArrayTag : public Tag {
     public:
         ByteArrayTag(std::string name) : Tag(name){};
         ByteArrayTag(std::string name, std::vector<int8_t> data) : Tag(name){ this->data = data; }
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(ByteArray) " << GetName() << ": " << data.size() << std::endl;
             std::cout << std::hex << "(";
             for (size_t i = 0; i < data.size(); ++i) {

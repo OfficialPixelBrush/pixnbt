@@ -6,7 +6,7 @@ class LongTag : public Tag {
     int64_t data = 0;
     public:
         LongTag(std::string name, int64_t data = 0) : Tag(name){ this->data = data; }
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(Long) " << GetName() << ": " << data << std::endl;
         }
         uint8_t GetTagId() override {

@@ -6,7 +6,7 @@ class StringTag : public Tag {
         std::string data = "";
     public:
         StringTag(std::string name, std::string data = "") : Tag(name){ this->data = data; }
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(String) " << GetName() << ": " << data << std::endl;
         }
         uint8_t GetTagId() override {

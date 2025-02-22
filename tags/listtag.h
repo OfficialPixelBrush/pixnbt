@@ -28,11 +28,11 @@ class ListTag : public Tag {
             return tags[index];
         }
 
-        void PrintData() override {
+        void NbtPrintData() override {
             std::cout << "(List) " << GetName() << ": " << tags.size() << std::endl;
             for (const auto& t : tags) {
                 std::cout << "\t";
-                t->PrintData();
+                t->NbtPrintData();
             }
         }
         uint8_t GetTagId() override {
