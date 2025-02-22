@@ -39,7 +39,7 @@ std::vector<uint8_t> compressData(const std::vector<uint8_t>& inputData, int lev
     return compressedData;
 }
 
-std::shared_ptr<Tag> Item(int8_t slot, int16_t id, int8_t count, int16_t damage) {
+std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t damage) {
 	auto invSlot = std::make_shared<CompoundTag>(std::to_string((int)slot));
 	invSlot->Put(std::make_shared<ByteTag> ("Slot"  , slot));
 	invSlot->Put(std::make_shared<ShortTag>("id"    , id));

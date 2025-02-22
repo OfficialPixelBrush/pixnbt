@@ -38,8 +38,8 @@ int main() {
 	auto inventory = std::make_shared<ListTag>("Inventory");
 	root->Put(inventory);
 
-	inventory->Put(Item(0,17,64,0));
-	inventory->Put(Item(1, 7,64,0));
+	inventory->Put(NbtItem(0,17,64,0));
+	inventory->Put(NbtItem(1, 7,64,0));
 
 	// Yeet to file
 	WriteToFile("player.dat",root);
