@@ -1,6 +1,5 @@
 #include "tag.h"
-
-#include "tags/alltags.h"
+#include "alltags.h"
 
 std::string GetTagName(int8_t type) {
     switch(type) {

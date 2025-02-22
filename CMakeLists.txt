@@ -10,16 +10,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(
-    "${PROJECT_SOURCE_DIR}/src/nbt"
-    "${PROJECT_SOURCE_DIR}/src/"
+    "${PROJECT_SOURCE_DIR}/nbt"
+    "${PROJECT_SOURCE_DIR}/"
     ${LUA_INCLUDE_DIR}
 )
 
 add_executable(
     pixnbt
     
-    src/nbt/tag.cpp
-    src/main.cpp
+    tags/tag.cpp
+    example.cpp
 )
 
 # this is only defined to expose jthreads

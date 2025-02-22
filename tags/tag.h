@@ -1,5 +1,4 @@
 #pragma once
-
 #include <libdeflate.h>
 #include <iostream>
 #include <fstream>

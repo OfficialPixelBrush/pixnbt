@@ -1,6 +1,5 @@
 #pragma once
 #include "tag.h"
-#include "alltags.h"
 
 class ListTag : public Tag {
     private:

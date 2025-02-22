@@ -1,4 +1,5 @@
 #pragma once
+#include "tags/tag.h"
 #include "tags/alltags.h"
 
 // Compress binary data with libdeflate

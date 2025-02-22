@@ -1,6 +1,5 @@
 #pragma once
 #include "tag.h"
-#include "alltags.h"
 
 class CompoundTag : public Tag {
     private:

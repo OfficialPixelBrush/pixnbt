@@ -1,4 +1,4 @@
-#include "nbt/nbt.h"
+#include "nbt.h"
 
 int main() {
 	// player.nbt
