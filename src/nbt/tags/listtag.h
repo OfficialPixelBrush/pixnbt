@@ -4,7 +4,7 @@
 
 class ListTag : public Tag {
     private:
-        std::vector<Tag*> tags;
+        std::vector<std::shared_ptr<Tag>> tags;
         uint8_t tagType;
     public:
         ListTag(std::string name) : Tag(name){};
@@ -15,17 +15,17 @@ class ListTag : public Tag {
                 tagType = tag->GetTagId();
             }
             if (tag->GetTagId() == tagType) {
-                tags.push_back(tag.get());
+                tags.push_back(tag);
             } else {
                 std::cout << "Non-matching Tag in list!" << std::endl;
             }
         }
 
-        std::vector<Tag*> GetTags() {
+        std::vector<std::shared_ptr<Tag>> GetTags() {
             return tags;
         }
 
-        Tag* Get(size_t index) {   
+        std::shared_ptr<Tag> Get(size_t index) {   
             return tags[index];
         }
 
@@ -39,7 +39,7 @@ class ListTag : public Tag {
         uint8_t GetTagId() override {
             return (uint8_t)TAG_LIST;
         }
-        void Write(std::ofstream& stream, bool primary = true) override {
+        void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }

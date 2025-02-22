@@ -9,6 +9,7 @@
 #include <cstring>
 #include <algorithm>
 #include "endian.h"
+#include <sstream>
 
 enum Tags {
     TAG_END         =  0,
@@ -29,26 +30,27 @@ class Tag {
     private:
         std::string name = "";
     public:
-        virtual uint8_t GetTagId() = 0;
-        virtual void Write(std::ofstream& stream, bool primary = true) = 0;
-        void Read(std::ifstream& stream);
-
         virtual ~Tag() = default;  
-        Tag(std::string name = "");
-        
-        std::string GetTagName(int8_t type);
-
-        Tag* ReadNamedTag(std::ifstream stream);
-        void WriteNamedTag(Tag tag, std::ofstream stream);
-        Tag* SetName(std::string name);
-        std::string GetName();
-        void WriteHeader(std::ofstream& stream) {
-            stream << GetTagId();
-            uint16_t nameSize = Swap16(static_cast<uint16_t>(name.size())); // Convert size to big-endian
-            stream.write(reinterpret_cast<const char*>(&nameSize), sizeof(nameSize)); // Write swapped size
-            stream << name;
-        };
+        virtual uint8_t GetTagId() = 0;
+        virtual void Write(std::ostringstream& stream, bool primary = true) = 0;
         virtual void PrintData() {
             std::cout << "(Tag) " << GetName() << ": " << "RAW" << std::endl;
         };
+        Tag(std::string name = "") { this->name = name; }
+
+        std::string GetName() { return name; }
+        Tag* SetName(std::string name) {
+            this->name = name;
+            return this;
+        }
+
+        void WriteHeader(std::ostringstream& stream) {
+            stream << GetTagId();
+            uint16_t nameSize = Swap16(static_cast<uint16_t>(name.size())); 
+            stream.write(reinterpret_cast<const char*>(&nameSize), sizeof(nameSize));
+            stream << name;
+        };
 };
+
+std::shared_ptr<Tag> NewTag(uint8_t type, std::string name = "");
+std::string GetTagName(int8_t type);

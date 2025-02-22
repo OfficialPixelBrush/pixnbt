@@ -12,7 +12,7 @@ class IntTag : public Tag {
         uint8_t GetTagId() override {
             return (uint8_t)TAG_INT;
         }
-        void Write(std::ofstream& stream, bool primary = true) override {
+        void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }

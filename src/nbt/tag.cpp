@@ -1,19 +1,8 @@
 #include "tag.h"
 
-Tag::Tag(std::string name) {
-    this->name = name;
-}
+#include "tags/alltags.h"
 
-Tag* Tag::SetName(std::string name) {
-    this->name = name;
-    return this;
-}
-
-std::string Tag::GetName() {
-    return name;
-}
-
-std::string Tag::GetTagName(int8_t type) {
+std::string GetTagName(int8_t type) {
     switch(type) {
         case TAG_END:
             return "TAG_End";
@@ -39,4 +28,31 @@ std::string Tag::GetTagName(int8_t type) {
             return "TAG_Compound";
     }
     return "UNKNOWN";
+}
+
+std::shared_ptr<Tag> NewTag(uint8_t type, std::string name) {
+    switch(type) {
+        case TAG_BYTE:
+            return std::make_shared<ByteTag>(name);
+        case TAG_SHORT:
+            return std::make_shared<ShortTag>(name);
+        case TAG_INT:
+            return std::make_shared<IntTag>(name);
+        case TAG_LONG:
+            return std::make_shared<LongTag>(name);
+        case TAG_FLOAT:
+            return std::make_shared<FloatTag>(name);
+        case TAG_DOUBLE:
+            return std::make_shared<DoubleTag>(name);
+        case TAG_BYTE_ARRAY:
+            return std::make_shared<ByteArrayTag>(name);
+        case TAG_STRING:
+            return std::make_shared<StringTag>(name);
+        case TAG_LIST:
+            return std::make_shared<ListTag>(name);
+        case TAG_COMPOUND:
+            return std::make_shared<CompoundTag>(name);
+        default:
+            return nullptr;
+    }
 }

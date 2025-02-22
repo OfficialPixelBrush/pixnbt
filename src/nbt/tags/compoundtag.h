@@ -4,29 +4,30 @@
 
 class CompoundTag : public Tag {
     private:
-        std::vector<Tag*> tags;
+        std::vector<std::shared_ptr<Tag>> tags;
     public:
         CompoundTag(std::string name) : Tag(name){};
 
         // TODO: Check if a tag of the same name already exists?
         void Put(const std::string& name, std::shared_ptr<Tag> tag) {
-            tags.push_back(tag->SetName(name));
+            tag->SetName(name);
+            tags.push_back(tag);
         }
 
         void Put(std::shared_ptr<Tag> tag) {
-            tags.push_back(tag.get());
+            tags.push_back(tag);
         }
 
-        std::vector<Tag*> GetTags() {
+        std::vector<std::shared_ptr<Tag>> GetTags() {
             return tags;
         }
-
-        Tag* Get(const std::string& name) {
+        
+        std::shared_ptr<Tag> Get(const std::string& name) {
             auto it = std::find_if(tags.begin(), tags.end(),
-                [&](Tag* tag) { return tag->GetName() == name; });
+                [&](const std::shared_ptr<Tag>& tag) { return tag->GetName() == name; });
 
             if (it == tags.end()) return nullptr;
-            return *it;
+            return *it; // Return the shared_ptr<Tag>
         }
 
         void PrintData() override {
@@ -39,7 +40,7 @@ class CompoundTag : public Tag {
         uint8_t GetTagId() override {
             return (uint8_t)TAG_COMPOUND;
         }
-        void Write(std::ofstream& stream, bool primary = true) override {
+        void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }
@@ -47,5 +48,25 @@ class CompoundTag : public Tag {
                 t->Write(stream);
             }
             stream << (uint8_t)TAG_END;
+        }
+        void Read(std::istringstream& stream) {
+            while(true) {
+                uint8_t type;
+                stream.get(reinterpret_cast<char&>(type));
+                if (type == 0) {
+                    break;
+                }
+                uint16_t nameLength;
+                stream.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));  // Read raw bytes for integer
+                nameLength = Swap16(nameLength);
+                std::string tagName(nameLength, '\0');
+                stream.read(&tagName[0], nameLength);
+
+                std::cout << tagName << std::endl;
+
+                auto newTag = NewTag(type, tagName);
+                //newTag->Read(stream);
+                Put(newTag);
+            }
         }
 };

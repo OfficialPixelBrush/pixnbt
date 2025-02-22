@@ -5,6 +5,7 @@ class ByteArrayTag : public Tag {
     private:
         std::vector<int8_t> data;
     public:
+        ByteArrayTag(std::string name) : Tag(name){};
         ByteArrayTag(std::string name, std::vector<int8_t> data) : Tag(name){ this->data = data; }
         void PrintData() override {
             std::cout << "(ByteArray) " << GetName() << ": " << data.size() << std::endl;
@@ -20,7 +21,7 @@ class ByteArrayTag : public Tag {
         uint8_t GetTagId() override {
             return (uint8_t)TAG_BYTE_ARRAY;
         }
-        void Write(std::ofstream& stream, bool primary = true) override {
+        void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }
