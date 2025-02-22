@@ -2,7 +2,6 @@
 
 int main() {
 	// player.nbt
-	/*
 	auto root = std::make_shared<CompoundTag>("");
 
 	auto motionList = std::make_shared<ListTag>("Motion");
@@ -43,12 +42,13 @@ int main() {
 	inventory->Put(Item(1, 7,64,0));
 
 	// Yeet to file
-	WriteToFile("PixelBrushArt3.dat",root,true);
-	*/
+	WriteToFile("player.dat",root);
+	std::cout << "--- Written ---" << std::endl;
+	root->PrintData();
 
-	auto newRoot = ReadFromFile("PixelBrushArt.dat");
-
-	newRoot->PrintData();
+	auto readRoot = ReadFromFile("player.dat");
+	std::cout << "--- Read ---" << std::endl;
+	readRoot->PrintData();
 
 	return 0;
 }
