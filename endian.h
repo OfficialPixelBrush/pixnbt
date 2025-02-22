@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 static uint16_t Swap16(uint16_t value) {
     return  (value >> 8) | 

@@ -1,4 +1,15 @@
 #pragma once
+#include <libdeflate.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <memory>
+#include <vector>
+#include <cstring>
+#include <algorithm>
+#include "endian.h"
+#include <sstream>
+
 #include "tags/tag.h"
 #include "tags/alltags.h"
 
