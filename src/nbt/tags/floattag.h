@@ -20,4 +20,10 @@ class FloatTag : public Tag {
             writtenData = Swap32(writtenData);  // Swap bytes if needed
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
+        void Read(std::istringstream& stream) override {
+            uint32_t rawData;
+            stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
+            rawData = Swap32(rawData);
+            data = *reinterpret_cast<float*>(&rawData);
+        }
 };

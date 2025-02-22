@@ -31,4 +31,6 @@ class ByteArrayTag : public Tag {
                 stream << d;
             }
         }
+        void Read(std::istringstream& stream) override {
+        }
 };

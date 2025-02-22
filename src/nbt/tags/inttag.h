@@ -7,7 +7,7 @@ class IntTag : public Tag {
     public:
         IntTag(std::string name, int32_t data = 0) : Tag(name){ this->data = data; }
         void PrintData() override {
-            std::cout << "(Int) " << GetName() << ": 0x" << std::hex << (int)data << std::dec << std::endl;
+            std::cout << "(Int) " << GetName() << ": " << (int)data << std::endl;
         }
         uint8_t GetTagId() override {
             return (uint8_t)TAG_INT;
@@ -18,5 +18,10 @@ class IntTag : public Tag {
             }
             uint32_t writtenData = Swap32(data);
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
+        }
+        void Read(std::istringstream& stream) override {
+            uint32_t rawData;
+            stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
+            data = Swap32(rawData);
         }
 };

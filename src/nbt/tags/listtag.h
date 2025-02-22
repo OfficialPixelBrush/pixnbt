@@ -53,4 +53,18 @@ class ListTag : public Tag {
                 }
             }
         }
+        void Read(std::istringstream& stream) override {
+            uint8_t type;
+            stream.get(reinterpret_cast<char&>(type));
+
+            uint32_t readSize;
+            stream.read(reinterpret_cast<char*>(&readSize), sizeof(readSize));  // Read raw bytes for integer
+            readSize = Swap32(readSize);
+
+            for (uint32_t i = 0; i < readSize; i++) {
+                auto newTag = NewTag(type);
+                newTag->Read(stream);
+                Put(newTag);
+            }
+        }
 };

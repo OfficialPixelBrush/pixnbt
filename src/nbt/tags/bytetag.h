@@ -7,7 +7,7 @@ class ByteTag : public Tag {
     public:
         ByteTag(std::string name, int8_t data = 0) : Tag(name){ this->data = data; }
         void PrintData() override {
-            std::cout << "(Byte) " << GetName() << ": 0x" << std::hex << (int)data << std::dec << std::endl;
+            std::cout << "(Byte) " << GetName() << ": " << (int)data << std::endl;
         }
         uint8_t GetTagId() override {
             return (uint8_t)TAG_BYTE;
@@ -17,5 +17,8 @@ class ByteTag : public Tag {
                 WriteHeader(stream);
             }
             stream.write(reinterpret_cast<const char*>(&data), sizeof(data));
+        }
+        void Read(std::istringstream& stream) override {
+            stream.get(reinterpret_cast<char&>(data));
         }
 };

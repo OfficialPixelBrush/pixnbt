@@ -49,24 +49,27 @@ class CompoundTag : public Tag {
             }
             stream << (uint8_t)TAG_END;
         }
-        void Read(std::istringstream& stream) {
+        void Read(std::istringstream& stream) override {
+            int tags = 0;
             while(true) {
                 uint8_t type;
                 stream.get(reinterpret_cast<char&>(type));
                 if (type == 0) {
                     break;
                 }
-                uint16_t nameLength;
-                stream.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));  // Read raw bytes for integer
-                nameLength = Swap16(nameLength);
-                std::string tagName(nameLength, '\0');
-                stream.read(&tagName[0], nameLength);
-
-                std::cout << tagName << std::endl;
+                uint16_t nameSize;
+                stream.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
+                nameSize = Swap16(nameSize);
+                std::string tagName(nameSize, '\0');
+                stream.read(&tagName[0], nameSize);
 
                 auto newTag = NewTag(type, tagName);
-                //newTag->Read(stream);
+                if (!newTag) {
+                    break;
+                }
+                newTag->Read(stream);
                 Put(newTag);
+                tags++;
             }
         }
 };

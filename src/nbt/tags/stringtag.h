@@ -18,4 +18,11 @@ class StringTag : public Tag {
             }
             stream << Swap16(data.size()) << data;
         }
+        void Read(std::istringstream& stream) override {
+            uint16_t stringSize;
+            stream.read(reinterpret_cast<char*>(&stringSize), sizeof(stringSize));  // Read raw bytes for integer
+            stringSize = Swap16(stringSize);
+            std::string data(stringSize, '\0');
+            stream.read(&data[0], stringSize);
+        }
 };

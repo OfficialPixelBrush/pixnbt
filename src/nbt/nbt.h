@@ -59,25 +59,68 @@ void WriteToFile(std::string filename, std::shared_ptr<Tag> tag, bool compress =
 }
 
 std::shared_ptr<Tag> ReadFromFile(std::string filename, bool compressed = true) {
+    // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
-
     if (!file.is_open()) {
         std::cerr << "Error: File is not open!" << std::endl;
         return nullptr;
     }
 
+    // Read the entire file into memory
     file.seekg(0, std::ios::end);
     std::streamsize size = file.tellg();
     file.seekg(0, std::ios::beg);
 
-    std::string buffer(size, '\0');
-    
-    file.read(&buffer[0], size);
+    std::vector<uint8_t> compressed_data(size);
+    file.read(reinterpret_cast<char*>(compressed_data.data()), size);
     file.close();
-    
-    std::istringstream iss(buffer, std::ios::binary);
 
-	auto root = std::make_shared<CompoundTag>("");
-    root->Read(iss);
+    // If not compressed, use the data as is
+    std::string decompressed_data;
+    if (!compressed) {
+        decompressed_data.assign(compressed_data.begin(), compressed_data.end());
+    } else {
+        // Step 1: Create decompressor
+        libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
+        if (!decompressor) {
+            std::cerr << "Failed to allocate libdeflate decompressor!" << std::endl;
+            return nullptr;
+        }
+
+        // Step 2: Estimate decompressed size (adjust if needed)
+        size_t estimated_size = size * 10; // Guessing the decompressed size
+        decompressed_data.resize(estimated_size);
+
+        // Step 3: Decompress
+        size_t actual_size;
+        libdeflate_result result = libdeflate_gzip_decompress(
+            decompressor,
+            compressed_data.data(), size,           // Input data
+            decompressed_data.data(), estimated_size, // Output buffer
+            &actual_size                              // Actual decompressed size
+        );
+
+        libdeflate_free_decompressor(decompressor);
+
+        if (result != LIBDEFLATE_SUCCESS) {
+            std::cerr << "Decompression failed!" << std::endl;
+            return nullptr;
+        }
+
+        decompressed_data.resize(actual_size); // Trim to actual decompressed size
+    }
+
+    // Append a single null byte
+    // End tag of above root
+    decompressed_data.push_back('\0'); 
+    
+    std::istringstream iss(decompressed_data, std::ios::binary);
+
+	auto overRoot = std::make_shared<CompoundTag>("");
+    overRoot->Read(iss);
+    auto root = *overRoot->GetTags().begin();
+    if (!root) {
+        std::cerr << "No root found!" << std::endl;
+    }
     return root;
 }
