@@ -1,6 +1,6 @@
 #include "nbt.h"
 
-std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, int level = 6) {
+std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, int level) {
     libdeflate_compressor* compressor = libdeflate_alloc_compressor(level);
     if (!compressor) {
         throw std::runtime_error("Failed to allocate libdeflate compressor");
@@ -34,7 +34,7 @@ std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t dama
 	return invSlot;
 }
 
-void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, bool compress = true) {
+void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, bool compress) {
     std::ostringstream buffer(std::ios::binary);
 
 	tag->Write(buffer,true);
@@ -56,7 +56,7 @@ void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, bool compres
     file.close();
 }
 
-std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed = true) {
+std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {

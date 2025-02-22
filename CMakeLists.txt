@@ -19,6 +19,7 @@ add_executable(
     pixnbt
     
     tags/tag.cpp
+    nbt.cpp
     example.cpp
 )
 
