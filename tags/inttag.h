@@ -24,4 +24,7 @@ class IntTag : public Tag {
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
             data = Swap32(rawData);
         }
+        int32_t GetData() {
+            return data;
+        }
 };

@@ -21,4 +21,7 @@ class ByteTag : public Tag {
         void Read(std::istringstream& stream) override {
             stream.get(reinterpret_cast<char&>(data));
         }
+        int8_t GetData() {
+            return data;
+        }
 };

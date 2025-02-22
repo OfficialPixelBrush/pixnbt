@@ -25,4 +25,7 @@ class StringTag : public Tag {
             std::string data(stringSize, '\0');
             stream.read(&data[0], stringSize);
         }
+        std::string GetData() {
+            return data;
+        }
 };

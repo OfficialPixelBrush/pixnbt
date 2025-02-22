@@ -33,4 +33,7 @@ class ByteArrayTag : public Tag {
         }
         void Read(std::istringstream& stream) override {
         }
+        std::vector<int8_t> GetData() {
+            return data;
+        }
 };

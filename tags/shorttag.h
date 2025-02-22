@@ -3,7 +3,7 @@
 
 class ShortTag : public Tag {
     private:
-    int16_t data = 0;
+        int16_t data = 0;
     public:
         ShortTag(std::string name, int16_t data = 0) : Tag(name){ this->data = data; }
         void NbtPrintData() override {
@@ -23,5 +23,8 @@ class ShortTag : public Tag {
             uint16_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
             data = Swap16(rawData);
+        }
+        int16_t GetData() {
+            return data;
         }
 };

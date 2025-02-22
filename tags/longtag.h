@@ -3,7 +3,7 @@
 
 class LongTag : public Tag {
     private:
-    int64_t data = 0;
+        int64_t data = 0;
     public:
         LongTag(std::string name, int64_t data = 0) : Tag(name){ this->data = data; }
         void NbtPrintData() override {
@@ -23,5 +23,8 @@ class LongTag : public Tag {
             uint64_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
             data = Swap64(rawData);
+        }
+        int64_t GetData() {
+            return data;
         }
 };

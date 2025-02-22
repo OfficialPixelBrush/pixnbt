@@ -26,4 +26,7 @@ class DoubleTag : public Tag {
             rawData = Swap64(rawData);
             data = *reinterpret_cast<double*>(&rawData);
         }
+        double GetData() {
+            return data;
+        }
 };

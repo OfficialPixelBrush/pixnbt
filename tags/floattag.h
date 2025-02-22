@@ -26,4 +26,7 @@ class FloatTag : public Tag {
             rawData = Swap32(rawData);
             data = *reinterpret_cast<float*>(&rawData);
         }
+        float GetData() {
+            return data;
+        }
 };
