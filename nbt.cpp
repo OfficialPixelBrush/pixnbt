@@ -124,13 +124,14 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed) {
 }
 
 int8_t NbtConvertToSlot(int8_t slot) {
-    // shift to hotbar
-    if (slot >= 36) {
+    // Hotbar slots in NBT
+    if (slot >= 36 && slot <= 44) {
         return slot - 36;
     }
-    // shift to rest(?)
-    if (slot <= 8) {
-        return slot + 35;
+    // Hotbar slots in GUI
+    if (slot >= 0 && slot <= 8) {
+        return slot + 36;
     }
-    return 0;
+    // Preserve main inventory slots (9-35)
+    return slot;
 }

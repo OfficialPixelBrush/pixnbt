@@ -24,6 +24,10 @@ class ListTag : public Tag {
             return tags;
         }
 
+        size_t GetNumberOfTags() {
+            return tags.size();
+        }
+
         std::shared_ptr<Tag> Get(size_t index) {   
             return tags[index];
         }

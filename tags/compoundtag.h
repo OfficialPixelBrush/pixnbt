@@ -20,6 +20,10 @@ class CompoundTag : public Tag {
         std::vector<std::shared_ptr<Tag>> GetTags() {
             return tags;
         }
+
+        size_t GetNumberOfTags() {
+            return tags.size();
+        }
         
         std::shared_ptr<Tag> Get(const std::string& name) {
             auto it = std::find_if(tags.begin(), tags.end(),
