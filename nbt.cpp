@@ -132,4 +132,5 @@ int8_t NbtConvertToSlot(int8_t slot) {
     if (slot <= 8) {
         return slot + 35;
     }
+    return 0;
 }
