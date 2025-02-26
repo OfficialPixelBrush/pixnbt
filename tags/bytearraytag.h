@@ -25,13 +25,22 @@ class ByteArrayTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            int32_t size = static_cast<int32_t>(data.size());
-            stream.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            uint32_t writtenSize = Swap32(data.size());
+            stream.write(reinterpret_cast<const char*>(&writtenSize), sizeof(writtenSize));
             for (const auto& d : data) {
                 stream << d;
             }
         }
         void Read(std::istringstream& stream) override {
+            uint32_t readSize;
+            stream.read(reinterpret_cast<char*>(&readSize), sizeof(readSize));  // Read raw bytes for integer
+            readSize = Swap32(readSize);
+
+            for (uint32_t i = 0; i < readSize; i++) {
+                uint8_t readData;
+                stream.get(reinterpret_cast<char&>(readData));
+                data.push_back(readData);
+            }
         }
         std::vector<int8_t> GetData() {
             return data;
