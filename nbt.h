@@ -1,4 +1,5 @@
 #pragma once
+#include <libdeflate.h>
 #include "tags/tag.h"
 #include "tags/alltags.h"
 

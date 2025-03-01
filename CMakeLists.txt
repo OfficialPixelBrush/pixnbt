@@ -34,4 +34,5 @@ set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=address")
 
 target_link_libraries(
     pixnbt
+    deflate
 )
