@@ -1,19 +1,36 @@
 #include "nbt.h"
 
-std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, int level) {
+std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, int algorithm, int level) {
     libdeflate_compressor* compressor = libdeflate_alloc_compressor(level);
     if (!compressor) {
         throw std::runtime_error("Failed to allocate libdeflate compressor");
     }
 
     // Allocate max possible compressed size
-    size_t maxCompressedSize = libdeflate_gzip_compress_bound(compressor, inputData.size());
-    std::vector<uint8_t> compressedData(maxCompressedSize);
+    size_t maxCompressedSize;
+    size_t actualSize;
+    std::vector<uint8_t> compressedData;
+    if (algorithm == NBT_GZIP) {
+        maxCompressedSize = libdeflate_gzip_compress_bound(compressor, inputData.size());
+        compressedData.resize(maxCompressedSize);
 
-    // Perform compression
-    size_t actualSize = libdeflate_gzip_compress(compressor, 
-                                                 inputData.data(), inputData.size(), 
-                                                 compressedData.data(), compressedData.size());
+        // Perform compression
+        actualSize = libdeflate_gzip_compress(compressor, 
+                                                    inputData.data(), inputData.size(), 
+                                                    compressedData.data(), compressedData.size());
+    } else if (algorithm == NBT_ZLIB) {
+        maxCompressedSize = libdeflate_zlib_compress_bound(compressor, inputData.size());
+        compressedData.resize(maxCompressedSize);
+
+        // Perform compression
+        actualSize = libdeflate_zlib_compress(compressor, 
+                                                    inputData.data(), inputData.size(), 
+                                                    compressedData.data(), compressedData.size());
+    } else {
+        maxCompressedSize = inputData.size();
+        actualSize = inputData.size();
+        compressedData = inputData;
+    }
 
     libdeflate_free_compressor(compressor);
 
@@ -25,16 +42,7 @@ std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, int 
     return compressedData;
 }
 
-std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t damage) {
-	auto invSlot = std::make_shared<CompoundTag>(std::to_string((int)slot));
-	invSlot->Put(std::make_shared<ByteTag> ("Slot"  , slot));
-	invSlot->Put(std::make_shared<ShortTag>("id"    , id));
-	invSlot->Put(std::make_shared<ByteTag> ("Count" , count));
-	invSlot->Put(std::make_shared<ShortTag>("Damage", damage));
-	return invSlot;
-}
-
-void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, bool compress) {
+void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, int algorithm) {
     std::ostringstream buffer(std::ios::binary);
 
 	tag->Write(buffer,true);
@@ -44,19 +52,19 @@ void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, bool compres
         std::cerr << "Failed to open output file\n";
         return;
     }
-    if (compress) {
+    if (algorithm == NBT_UNCOMPRESSED) {
+        file.write(buffer.str().c_str(), buffer.str().size());
+    } else {
         std::string str = buffer.str();
         std::vector<uint8_t> inputData(str.begin(), str.end());
-        std::vector<uint8_t> compressedData = NbtCompressData(inputData);
+        std::vector<uint8_t> compressedData = NbtCompressData(inputData,algorithm);
 
         file.write(reinterpret_cast<const char*>(compressedData.data()), compressedData.size());
-    } else {
-        file.write(buffer.str().c_str(), buffer.str().size());
     }
     file.close();
 }
 
-std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed) {
+std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -75,28 +83,35 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed) {
 
     // If not compressed, use the data as is
     std::string decompressed_data;
-    if (!compressed) {
+    libdeflate_result result;
+    if (algorithm == NBT_UNCOMPRESSED) {
         decompressed_data.assign(compressed_data.begin(), compressed_data.end());
     } else {
-        // Step 1: Create decompressor
         libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
         if (!decompressor) {
             std::cerr << "Failed to allocate libdeflate decompressor!" << std::endl;
             return nullptr;
         }
 
-        // Step 2: Estimate decompressed size (adjust if needed)
         size_t estimated_size = size * 10; // Guessing the decompressed size
         decompressed_data.resize(estimated_size);
 
-        // Step 3: Decompress
         size_t actual_size;
-        libdeflate_result result = libdeflate_gzip_decompress(
-            decompressor,
-            compressed_data.data(), size,           // Input data
-            decompressed_data.data(), estimated_size, // Output buffer
-            &actual_size                              // Actual decompressed size
-        );
+        if (algorithm == NBT_GZIP) {
+            result = libdeflate_gzip_decompress(
+                decompressor,
+                compressed_data.data(), size,           // Input data
+                decompressed_data.data(), estimated_size, // Output buffer
+                &actual_size                              // Actual decompressed size
+            );
+        } else if (algorithm == NBT_ZLIB) {
+            result = libdeflate_zlib_decompress(
+                decompressor,
+                compressed_data.data(), size,           // Input data
+                decompressed_data.data(), estimated_size, // Output buffer
+                &actual_size                              // Actual decompressed size
+            );
+        }
 
         libdeflate_free_decompressor(decompressor);
 
@@ -121,6 +136,15 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, bool compressed) {
         std::cerr << "No root found!" << std::endl;
     }
     return root;
+}
+
+std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t damage) {
+	auto invSlot = std::make_shared<CompoundTag>(std::to_string((int)slot));
+	invSlot->Put(std::make_shared<ByteTag> ("Slot"  , slot));
+	invSlot->Put(std::make_shared<ShortTag>("id"    , id));
+	invSlot->Put(std::make_shared<ByteTag> ("Count" , count));
+	invSlot->Put(std::make_shared<ShortTag>("Damage", damage));
+	return invSlot;
 }
 
 int8_t NbtConvertToSlot(int8_t slot) {

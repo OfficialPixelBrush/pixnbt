@@ -15,13 +15,13 @@ int main() {
 
 	// Yeet to file
 	// Apparently the file itself is terminated with another TAG_END(?)
-	NbtWriteToFile("file.dat",root);
+	NbtWriteToFile("file.dat",root,NBT_GZIP);
 	if (root) {
 		std::cout << "--- Written ---" << std::endl;
 		root->NbtPrintData();
 	}
 
-	auto readOwnRoot = NbtReadFromFile("file.dat");
+	auto readOwnRoot = NbtReadFromFile("file.dat",NBT_GZIP);
 	if (readOwnRoot) {
 		std::cout << "--- Read ---" << std::endl;
 		readOwnRoot->NbtPrintData();
