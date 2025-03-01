@@ -36,6 +36,9 @@ class ByteArrayTag : public Tag {
             stream.read(reinterpret_cast<char*>(&readSize), sizeof(readSize));  // Read raw bytes for integer
             readSize = Swap32(readSize);
 
+            // Reserve the size beforehand
+            data.reserve(readSize);
+
             for (uint32_t i = 0; i < readSize; i++) {
                 uint8_t readData;
                 stream.get(reinterpret_cast<char&>(readData));
