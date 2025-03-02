@@ -64,7 +64,7 @@ void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, int algorith
     file.close();
 }
 
-std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
+std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm, int multiplier) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -82,7 +82,7 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
     file.close();
 
     // If not compressed, use the data as is
-    size_t estimated_size = size * 25;
+    size_t estimated_size = size * multiplier;
     std::vector<uint8_t> decompressed_data(estimated_size);
     libdeflate_result result;
     if (algorithm == NBT_UNCOMPRESSED) {
