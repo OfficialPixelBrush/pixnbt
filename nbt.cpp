@@ -82,7 +82,8 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
     file.close();
 
     // If not compressed, use the data as is
-    std::string decompressed_data;
+    size_t estimated_size = size * 25;
+    std::vector<uint8_t> decompressed_data(estimated_size);
     libdeflate_result result;
     if (algorithm == NBT_UNCOMPRESSED) {
         decompressed_data.assign(compressed_data.begin(), compressed_data.end());
@@ -92,9 +93,6 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
             std::cerr << "Failed to allocate libdeflate decompressor!" << std::endl;
             return nullptr;
         }
-
-        size_t estimated_size = size * 10; // Guessing the decompressed size
-        decompressed_data.resize(estimated_size);
 
         size_t actual_size;
         if (algorithm == NBT_GZIP) {
@@ -116,7 +114,7 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
         libdeflate_free_decompressor(decompressor);
 
         if (result != LIBDEFLATE_SUCCESS) {
-            std::cerr << "Decompression failed!" << std::endl;
+            std::cerr << "Decompression failed! (" << result << ")" << std::endl;
             return nullptr;
         }
 
@@ -126,8 +124,9 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm) {
     // Append a single null byte
     // End tag of above root
     decompressed_data.push_back('\0'); 
-    
-    std::istringstream iss(decompressed_data, std::ios::binary);
+
+    std::string_view decompressed_str(reinterpret_cast<const char*>(decompressed_data.data()), decompressed_data.size());
+    std::istringstream iss(std::string(decompressed_str), std::ios::binary);
 
 	auto overRoot = std::make_shared<CompoundTag>("");
     overRoot->Read(iss);
