@@ -5,5 +5,7 @@ This is partially based on the NBT Classes Mojang provided with the [McRegion to
 
 This project is mostly meant for [BetrockServer](https://github.com/OfficialPixelBrush/BetrockServer).
 
+For info on how to use PixNBT, check out [the Wiki](https://github.com/OfficialPixelBrush/pixnbt/wiki).
+
 ## Similar projects
 - [cpp-nbt](https://github.com/SpockBotMC/cpp-nbt) by [SpockBotMC](https://github.com/SpockBotMC)
