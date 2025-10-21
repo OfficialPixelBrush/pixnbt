@@ -53,18 +53,18 @@ void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, int algorith
         return;
     }
     if (algorithm == NBT_UNCOMPRESSED) {
-        file.write(buffer.str().c_str(), buffer.str().size());
+        file.write(buffer.str().c_str(), static_cast<std::streamsize>(buffer.str().size()));
     } else {
         std::string str = buffer.str();
         std::vector<uint8_t> inputData(str.begin(), str.end());
         std::vector<uint8_t> compressedData = NbtCompressData(inputData,algorithm);
 
-        file.write(reinterpret_cast<const char*>(compressedData.data()), compressedData.size());
+        file.write(reinterpret_cast<const char*>(compressedData.data()), static_cast<std::streamsize>(compressedData.size()));
     }
     file.close();
 }
 
-std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm, int multiplier, size_t maxSize) {
+std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm, size_t multiplier, size_t maxSize) {
     // Open the file in binary mode
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -74,16 +74,17 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm, int mu
 
     // Read the entire file into memory
     file.seekg(0, std::ios::end);
-    std::streamsize size = file.tellg();
+    std::streamsize ssize = file.tellg();
+    size_t size = static_cast<size_t>(ssize);
     file.seekg(0, std::ios::beg);
 
     std::vector<uint8_t> compressed_data(size);
-    file.read(reinterpret_cast<char*>(compressed_data.data()), size);
+    file.read(reinterpret_cast<char*>(compressed_data.data()), ssize);
     file.close();
 
     // If not compressed, use the data as is
     size_t estimated_size;
-    if (maxSize == -1 && multiplier != -1) {
+    if (maxSize == 0 && multiplier != 0) {
         estimated_size = size * multiplier;
     } else {
         estimated_size = maxSize;
@@ -143,7 +144,7 @@ std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm, int mu
 }
 
 std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t damage) {
-	auto invSlot = std::make_shared<CompoundTag>(std::to_string((int)slot));
+	auto invSlot = std::make_shared<CompoundTag>(std::to_string(static_cast<int32_t>(slot)));
 	invSlot->Put(std::make_shared<ByteTag> ("Slot"  , slot));
 	invSlot->Put(std::make_shared<ShortTag>("id"    , id));
 	invSlot->Put(std::make_shared<ByteTag> ("Count" , count));

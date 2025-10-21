@@ -41,7 +41,7 @@ class CompoundTag : public Tag {
             }
         }
         uint8_t GetTagId() override {
-            return (uint8_t)TAG_COMPOUND;
+            return static_cast<uint8_t>(TAG_COMPOUND);
         }
         void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
@@ -50,7 +50,7 @@ class CompoundTag : public Tag {
             for (const auto& t : tags) {
                 t->Write(stream);
             }
-            stream << (uint8_t)TAG_END;
+            stream << static_cast<uint8_t>(TAG_END);
         }
         void Read(std::istringstream& stream) override {
             int tags = 0;

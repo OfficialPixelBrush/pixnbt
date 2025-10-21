@@ -36,3 +36,21 @@ target_link_libraries(
     pixnbt
     deflate
 )
+
+target_compile_options(pixnbt PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic           # Enforce strict ISO compliance
+    -Wconversion          # Implicit conversions (int → float, etc.)
+    -Wsign-conversion     # Sign mismatches
+    #-Wshadow              # Variable shadowing
+    -Wunused              # Unused variables, params, etc.
+    -Wuninitialized
+    -Werror               # Treat warnings as errors
+    -Wnon-virtual-dtor    # Common OOP pitfall
+    -Wold-style-cast
+    -Woverloaded-virtual
+    -Wnull-dereference
+    -Wdouble-promotion
+    -Wformat=2
+)

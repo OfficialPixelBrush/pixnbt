@@ -10,7 +10,7 @@ class DoubleTag : public Tag {
             std::cout << "(Double) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
         }
         uint8_t GetTagId() override {
-            return (uint8_t)TAG_DOUBLE;
+            return static_cast<uint8_t>(TAG_DOUBLE);
         }
         void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {

@@ -10,7 +10,7 @@ class FloatTag : public Tag {
             std::cout << "(Float) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
         }
         uint8_t GetTagId() override {
-            return (uint8_t)TAG_FLOAT;
+            return static_cast<uint8_t>(TAG_FLOAT);
         }
         void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {

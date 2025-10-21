@@ -40,15 +40,15 @@ class ListTag : public Tag {
             }
         }
         uint8_t GetTagId() override {
-            return (uint8_t)TAG_LIST;
+            return  static_cast<uint8_t>(TAG_LIST);
         }
         void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }
             // If no tags get added, defaults to value of TAG_END
-            stream << (uint8_t)tagType;
-            uint32_t writtenSize = Swap32(tags.size());
+            stream << static_cast<uint8_t>(tagType);
+            uint32_t writtenSize = Swap32(uint32_t(tags.size()));
             stream.write(reinterpret_cast<const char*>(&writtenSize), sizeof(writtenSize));
             for (size_t i = 0; i < tags.size(); ++i) {
                 // TODO: Can sometimes use-after-free??

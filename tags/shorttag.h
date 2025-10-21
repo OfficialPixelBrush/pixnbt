@@ -7,22 +7,22 @@ class ShortTag : public Tag {
     public:
         ShortTag(std::string name, int16_t data = 0) : Tag(name){ this->data = data; }
         void NbtPrintData() override {
-            std::cout << "(Short) " << GetName() << ": " << (int)data << std::endl;
+            std::cout << "(Short) " << GetName() << ": " << static_cast<int32_t>(data) << std::endl;
         }
         uint8_t GetTagId() override {
-            return (uint8_t)TAG_SHORT;
+            return static_cast<uint8_t>(TAG_SHORT);
         }
         void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint16_t writtenData = Swap16(data);
+            uint16_t writtenData = Swap16(static_cast<uint16_t>(data));
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
         void Read(std::istringstream& stream) override {
             uint16_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
-            data = Swap16(rawData);
+            data = static_cast<int16_t>(Swap16(rawData));
         }
         int16_t GetData() {
             return data;

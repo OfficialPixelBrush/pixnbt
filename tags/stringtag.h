@@ -10,13 +10,13 @@ class StringTag : public Tag {
             std::cout << "(String) " << GetName() << ": " << data << " (" << data.size() << ")" << std::endl;
         }
         uint8_t GetTagId() override {
-            return (uint8_t)TAG_STRING;
+            return static_cast<uint8_t>(TAG_STRING);
         }
         void Write(std::ostringstream& stream, bool primary = true) override {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint16_t writtenData = Swap16(data.size());
+            uint16_t writtenData = Swap16(static_cast<uint16_t>(data.size()));
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
             stream << data;
         }

@@ -9,7 +9,7 @@ int main() {
 	root->Put(std::make_shared<IntTag>("SpawnY", 64));
 	root->Put(std::make_shared<StringTag>("LevelName", "world"));
 	root->Put(std::make_shared<ByteTag>("thunderTime", 26271));
-	std::vector<int8_t> data = {0,1,2,3,4,5,6,8,7};
+	std::vector<uint8_t> data = {0,1,2,3,4,5,6,8,7};
 	root->Put(std::make_shared<ByteArrayTag>("binData",data));
 
 
