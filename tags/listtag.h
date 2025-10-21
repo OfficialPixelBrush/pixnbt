@@ -4,7 +4,7 @@
 class ListTag : public Tag {
     private:
         std::vector<std::shared_ptr<Tag>> tags;
-        uint8_t tagType;
+        uint8_t tagType = TAG_END;
     public:
         ListTag(std::string name) : Tag(name){};
 
@@ -46,6 +46,7 @@ class ListTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
+            // If no tags get added, defaults to value of TAG_END
             stream << (uint8_t)tagType;
             uint32_t writtenSize = Swap32(tags.size());
             stream.write(reinterpret_cast<const char*>(&writtenSize), sizeof(writtenSize));
