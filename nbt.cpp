@@ -153,6 +153,11 @@ std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t dama
 }
 
 int8_t NbtConvertToSlot(int8_t slot) {
+    // TODO: This is stupid, move it to BetrockServer!!!
+    // Armor slots
+    if (slot >= 100 && slot <= 104) {
+        return slot - 95;
+    }
     // Hotbar slots in NBT
     if (slot >= 36 && slot <= 44) {
         return slot - 36;
