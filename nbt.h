@@ -9,6 +9,10 @@ enum CompressionAlgorithm {
     NBT_UNCOMPRESSED
 };
 
+// Generic Stream
+void NbtWriteToStream(std::ofstream& stream, std::shared_ptr<Tag> tag, int algorithm = NBT_GZIP);
+std::shared_ptr<Tag> NbtReadFromStream(std::string filename, int algorithm = NBT_GZIP, size_t multiplier = 10, size_t maxSize = 0);
+
 // Compress binary data with libdeflate
 void NbtWriteToFile(std::string filename, std::shared_ptr<Tag> tag, int algorithm = NBT_GZIP);
 std::shared_ptr<Tag> NbtReadFromFile(std::string filename, int algorithm = NBT_GZIP, size_t multiplier = 10, size_t maxSize = 0);
