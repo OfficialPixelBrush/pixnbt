@@ -27,6 +27,3 @@ std::vector<uint8_t> NbtCompressData(
     CompressionAlgorithm algorithm = NBT_GZIP,
     int level = 6
 );
-
-std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t damage);
-int8_t NbtConvertToSlot(int8_t slot);

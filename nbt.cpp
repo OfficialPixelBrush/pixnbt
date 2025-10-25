@@ -142,30 +142,3 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
     }
     return root;
 }
-
-std::shared_ptr<Tag> NbtItem(int8_t slot, int16_t id, int8_t count, int16_t damage) {
-	auto invSlot = std::make_shared<CompoundTag>(std::to_string(static_cast<int32_t>(slot)));
-	invSlot->Put(std::make_shared<ByteTag> ("Slot"  , slot));
-	invSlot->Put(std::make_shared<ShortTag>("id"    , id));
-	invSlot->Put(std::make_shared<ByteTag> ("Count" , count));
-	invSlot->Put(std::make_shared<ShortTag>("Damage", damage));
-	return invSlot;
-}
-
-int8_t NbtConvertToSlot(int8_t slot) {
-    // TODO: This is stupid, move it to BetrockServer!!!
-    // Armor slots
-    if (slot >= 100 && slot <= 104) {
-        return slot - 95;
-    }
-    // Hotbar slots in NBT
-    if (slot >= 36 && slot <= 44) {
-        return slot - 36;
-    }
-    // Hotbar slots in GUI
-    if (slot >= 0 && slot <= 8) {
-        return slot + 36;
-    }
-    // Preserve main inventory slots (9-35)
-    return slot;
-}
