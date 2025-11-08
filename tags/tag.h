@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "endian.h"
 #include <sstream>
+#include <bit>
 
 enum Tags {
     TAG_END         =  0,

@@ -16,7 +16,7 @@ class FloatTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint32_t writtenData = *reinterpret_cast<uint32_t*>(&data);
+            uint32_t writtenData = std::bit_cast<uint32_t>(data);
             writtenData = Swap32(writtenData);  // Swap bytes if needed
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
@@ -24,7 +24,7 @@ class FloatTag : public Tag {
             uint32_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
             rawData = Swap32(rawData);
-            data = *reinterpret_cast<float*>(&rawData);
+            data = std::bit_cast<float>(rawData);
         }
         float GetData() {
             return data;
