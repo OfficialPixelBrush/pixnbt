@@ -90,7 +90,7 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
         estimated_size = maxSize;
     }
     std::vector<uint8_t> decompressed_data(estimated_size);
-    libdeflate_result result;
+    libdeflate_result result = LIBDEFLATE_SUCCESS;
     if (algorithm == NBT_UNCOMPRESSED) {
         decompressed_data.assign(compressed_data.begin(), compressed_data.end());
     } else {
