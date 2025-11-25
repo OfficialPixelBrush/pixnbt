@@ -16,7 +16,7 @@ class DoubleTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint64_t writtenData = std::bit_cast<uint64_t>(&data);
+            uint64_t writtenData = std::bit_cast<uint64_t>(data);
             writtenData = Swap64(writtenData);  // Swap bytes if needed
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
@@ -24,7 +24,7 @@ class DoubleTag : public Tag {
             uint64_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
             rawData = Swap64(rawData);
-            data = std::bit_cast<double>(&rawData);
+            data = std::bit_cast<double>(rawData);
         }
         double GetData() {
             return data;
