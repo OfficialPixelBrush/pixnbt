@@ -37,11 +37,11 @@ class Tag {
         virtual void NbtPrintData() {
             std::cout << "(Tag) " << GetName() << ": " << "RAW" << std::endl;
         };
-        Tag(std::string name = "") { this->name = name; }
+        Tag(std::string pName = "") { this->name = pName; }
 
         std::string GetName() { return name; }
-        Tag* SetName(std::string name) {
-            this->name = name;
+        Tag* SetName(std::string pName) {
+            this->name = pName;
             return this;
         }
 

@@ -5,7 +5,7 @@ class FloatTag : public Tag {
     private:
         float data = 0;
     public:
-        FloatTag(std::string name, float data = 0) : Tag(name){ this->data = data; }
+        FloatTag(std::string pName, float pData = 0) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
             std::cout << "(Float) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
         }

@@ -5,7 +5,7 @@ class DoubleTag : public Tag {
     private:
         double data = 0;
     public:
-        DoubleTag(std::string name, double data = 0) : Tag(name){ this->data = data; }
+        DoubleTag(std::string pName, double pData = 0.0) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
             std::cout << "(Double) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
         }

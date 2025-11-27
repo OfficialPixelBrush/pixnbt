@@ -6,7 +6,7 @@ class ListTag : public Tag {
         std::vector<std::shared_ptr<Tag>> tags;
         uint8_t tagType = TAG_END;
     public:
-        ListTag(std::string name) : Tag(name){};
+        ListTag(std::string pName) : Tag(pName){};
 
         void Put(std::shared_ptr<Tag> tag) {
             // This is the first tag we put in

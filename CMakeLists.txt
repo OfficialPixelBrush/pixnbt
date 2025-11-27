@@ -43,7 +43,7 @@ target_compile_options(pixnbt PRIVATE
     -Wpedantic           # Enforce strict ISO compliance
     -Wconversion          # Implicit conversions (int → float, etc.)
     -Wsign-conversion     # Sign mismatches
-    #-Wshadow              # Variable shadowing
+    -Wshadow              # Variable shadowing
     -Wunused              # Unused variables, params, etc.
     -Wuninitialized
     -Werror               # Treat warnings as errors

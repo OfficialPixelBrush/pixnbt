@@ -5,7 +5,7 @@ class StringTag : public Tag {
     private:
         std::string data = "";
     public:
-        StringTag(std::string name, std::string data = "") : Tag(name){ this->data = data; }
+        StringTag(std::string pName, std::string pData = "") : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
             std::cout << "(String) " << GetName() << ": " << data << " (" << data.size() << ")" << std::endl;
         }
@@ -26,13 +26,13 @@ class StringTag : public Tag {
                 return;
             }
             stringSize = Swap16(stringSize);
-            std::string tempdata(stringSize, '\0');
+            std::string tempData(stringSize, '\0');
             
-            if (!stream.read(tempdata.data(), stringSize)) {
+            if (!stream.read(tempData.data(), stringSize)) {
                 std::cerr << "Failed to read from stream!" << std::endl;
                 return;
             }
-            data = tempdata;
+            data = tempData;
         }
         std::string GetData() {
             return data;

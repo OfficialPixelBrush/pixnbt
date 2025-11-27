@@ -5,11 +5,11 @@ class CompoundTag : public Tag {
     private:
         std::vector<std::shared_ptr<Tag>> tags;
     public:
-        CompoundTag(std::string name) : Tag(name){};
+        CompoundTag(std::string pName) : Tag(pName){};
 
         // TODO: Check if a tag of the same name already exists?
-        void Put(const std::string& name, std::shared_ptr<Tag> tag) {
-            tag->SetName(name);
+        void Put(const std::string& pName, std::shared_ptr<Tag> tag) {
+            tag->SetName(pName);
             tags.push_back(tag);
         }
 
@@ -25,9 +25,9 @@ class CompoundTag : public Tag {
             return tags.size();
         }
         
-        std::shared_ptr<Tag> Get(const std::string& name) {
+        std::shared_ptr<Tag> Get(const std::string& pName) {
             auto it = std::find_if(tags.begin(), tags.end(),
-                [&](const std::shared_ptr<Tag>& tag) { return tag->GetName() == name; });
+                [&](const std::shared_ptr<Tag>& tag) { return tag->GetName() == pName; });
 
             if (it == tags.end()) return nullptr;
             return *it; // Return the shared_ptr<Tag>
@@ -53,7 +53,7 @@ class CompoundTag : public Tag {
             stream << static_cast<uint8_t>(TAG_END);
         }
         void Read(std::istringstream& stream) override {
-            int tags = 0;
+            int nTags = 0;
             while(true) {
                 uint8_t type;
                 stream.get(reinterpret_cast<char&>(type));
@@ -72,7 +72,7 @@ class CompoundTag : public Tag {
                 }
                 newTag->Read(stream);
                 Put(newTag);
-                tags++;
+                nTags++;
             }
         }
 };

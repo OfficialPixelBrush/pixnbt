@@ -5,13 +5,13 @@ class ByteArrayTag : public Tag {
     private:
         std::vector<uint8_t> data;
     public:
-        ByteArrayTag(std::string name) : Tag(name){};
+        ByteArrayTag(std::string pName) : Tag(pName){};
         // When std::array is passed
         template <size_t N>
-            ByteArrayTag(std::string name, const std::array<uint8_t, N>& arr)
-                : Tag(std::move(name)), data(arr.begin(), arr.end()) {}
+            ByteArrayTag(std::string pName, const std::array<uint8_t, N>& arr)
+                : Tag(std::move(pName)), data(arr.begin(), arr.end()) {}
         // When std::vector is passed
-        ByteArrayTag(std::string name, std::vector<uint8_t> data) : Tag(name){ this->data = data; }
+        ByteArrayTag(std::string pName, std::vector<uint8_t> pData) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
             std::cout << "(ByteArray) " << GetName() << ": " << data.size() << std::endl;
             std::cout << std::hex << "(";
