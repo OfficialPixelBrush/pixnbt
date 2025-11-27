@@ -35,7 +35,7 @@ class Tag {
         virtual void Write(std::ostringstream& stream, bool primary = true) = 0;
         virtual void Read(std::istringstream& stream) = 0;
         virtual void NbtPrintData() {
-            std::cout << "(Tag) " << GetName() << ": " << "RAW" << std::endl;
+            std::cout << "(Tag) " << GetName() << ": " << "RAW" << "\n";
         };
         Tag(std::string pName = "") { this->name = pName; }
 

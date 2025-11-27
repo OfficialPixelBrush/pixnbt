@@ -7,7 +7,7 @@ class FloatTag : public Tag {
     public:
         FloatTag(std::string pName, float pData = 0) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
-            std::cout << "(Float) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
+            std::cout << "(Float) " << GetName() << ": " << std::fixed << data << std::dec << "\n";
         }
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_FLOAT);

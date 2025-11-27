@@ -16,7 +16,7 @@ class ListTag : public Tag {
             if (tag->GetTagId() == tagType) {
                 tags.push_back(tag);
             } else {
-                std::cout << "Non-matching Tag in list!" << std::endl;
+                std::cout << "Non-matching Tag in list!" << "\n";
             }
         }
 
@@ -33,7 +33,7 @@ class ListTag : public Tag {
         }
 
         void NbtPrintData() override {
-            std::cout << "(List) " << GetName() << ": " << tags.size() << std::endl;
+            std::cout << "(List) " << GetName() << ": " << tags.size() << "\n";
             for (const auto& t : tags) {
                 std::cout << "\t";
                 t->NbtPrintData();

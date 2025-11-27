@@ -19,7 +19,7 @@ int main() {
 	NbtWrite(writeFile,root,NBT_GZIP);
 	writeFile.close();
 	if (root) {
-		std::cout << "--- Written ---" << std::endl;
+		std::cout << "--- Written ---" << "\n";
 		root->NbtPrintData();
 	}
 
@@ -27,7 +27,7 @@ int main() {
 	auto readOwnRoot = NbtRead(readFile,NBT_GZIP);
 	readFile.close();
 	if (readOwnRoot) {
-		std::cout << "--- Read ---" << std::endl;
+		std::cout << "--- Read ---" << "\n";
 		readOwnRoot->NbtPrintData();
 	}
 

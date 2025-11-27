@@ -44,7 +44,7 @@ std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, Comp
 
 void NbtWrite(std::ofstream& stream, std::shared_ptr<Tag> tag, CompressionAlgorithm algorithm) {
     if (!stream.is_open()) {
-        std::cerr << "Error: Failed to open stream or invalid stream!" << std::endl;
+        std::cerr << "Error: Failed to open stream or invalid stream!" << "\n";
         return;
     }
     // Creat temporary buffer
@@ -65,7 +65,7 @@ void NbtWrite(std::ofstream& stream, std::shared_ptr<Tag> tag, CompressionAlgori
 std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorithm, size_t multiplier, size_t maxSize) {
     // Open the file in binary mode
     if (!stream) {
-        std::cerr << "Error: Failed to open stream or invalid stream!" << std::endl;
+        std::cerr << "Error: Failed to open stream or invalid stream!" << "\n";
         return nullptr;
     }
 
@@ -73,7 +73,7 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
     stream.seekg(0, std::ios::end);
     std::streamsize ssize = stream.tellg();
     if (ssize <= 0) {
-        std::cerr << "Error: Invalid or empty stream!" << std::endl;
+        std::cerr << "Error: Invalid or empty stream!" << "\n";
         return nullptr;
     }
     size_t size = static_cast<size_t>(ssize);
@@ -96,7 +96,7 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
     } else {
         libdeflate_decompressor* decompressor = libdeflate_alloc_decompressor();
         if (!decompressor) {
-            std::cerr << "Failed to allocate libdeflate decompressor!" << std::endl;
+            std::cerr << "Failed to allocate libdeflate decompressor!" << "\n";
             return nullptr;
         }
 
@@ -120,7 +120,7 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
         libdeflate_free_decompressor(decompressor);
 
         if (result != LIBDEFLATE_SUCCESS) {
-            std::cerr << "Decompression failed! (" << result << ")" << std::endl;
+            std::cerr << "Decompression failed! (" << result << ")" << "\n";
             return nullptr;
         }
 
@@ -138,7 +138,7 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
     overRoot->Read(iss);
     auto root = *overRoot->GetTags().begin();
     if (!root) {
-        std::cerr << "No root found!" << std::endl;
+        std::cerr << "No root found!" << "\n";
     }
     return root;
 }

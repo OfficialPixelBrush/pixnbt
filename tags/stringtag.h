@@ -7,7 +7,7 @@ class StringTag : public Tag {
     public:
         StringTag(std::string pName, std::string pData = "") : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
-            std::cout << "(String) " << GetName() << ": " << data << " (" << data.size() << ")" << std::endl;
+            std::cout << "(String) " << GetName() << ": " << data << " (" << data.size() << ")" << "\n";
         }
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_STRING);
@@ -29,7 +29,7 @@ class StringTag : public Tag {
             std::string tempData(stringSize, '\0');
             
             if (!stream.read(tempData.data(), stringSize)) {
-                std::cerr << "Failed to read from stream!" << std::endl;
+                std::cerr << "Failed to read from stream!" << "\n";
                 return;
             }
             data = tempData;

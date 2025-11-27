@@ -7,7 +7,7 @@ class DoubleTag : public Tag {
     public:
         DoubleTag(std::string pName, double pData = 0.0) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
-            std::cout << "(Double) " << GetName() << ": " << std::fixed << data << std::dec << std::endl;
+            std::cout << "(Double) " << GetName() << ": " << std::fixed << data << std::dec << "\n";
         }
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_DOUBLE);

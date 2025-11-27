@@ -13,7 +13,7 @@ class ByteArrayTag : public Tag {
         // When std::vector is passed
         ByteArrayTag(std::string pName, std::vector<uint8_t> pData) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
-            std::cout << "(ByteArray) " << GetName() << ": " << data.size() << std::endl;
+            std::cout << "(ByteArray) " << GetName() << ": " << data.size() << "\n";
             std::cout << std::hex << "(";
             for (size_t i = 0; i < data.size(); ++i) {
                 std::cout << "0x" << static_cast<int>(static_cast<uint8_t>(data[i]));
@@ -21,7 +21,7 @@ class ByteArrayTag : public Tag {
                     std::cout << ",";
                 }
             }
-            std::cout << ")" << std::dec << std::endl;
+            std::cout << ")" << std::dec << "\n";
         }
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_BYTE_ARRAY);

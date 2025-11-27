@@ -34,7 +34,7 @@ class CompoundTag : public Tag {
         }
 
         void NbtPrintData() override {
-            std::cout << "(Compound) " << GetName() << ": " << tags.size() << std::endl;
+            std::cout << "(Compound) " << GetName() << ": " << tags.size() << "\n";
             for (const auto& t : tags) {
                 std::cout << "\t";
                 t->NbtPrintData();

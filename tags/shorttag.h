@@ -7,7 +7,7 @@ class ShortTag : public Tag {
     public:
         ShortTag(std::string pName, int16_t pData = 0) : Tag(pName){ this->data = pData; }
         void NbtPrintData() override {
-            std::cout << "(Short) " << GetName() << ": " << static_cast<int32_t>(data) << std::endl;
+            std::cout << "(Short) " << GetName() << ": " << static_cast<int32_t>(data) << "\n";
         }
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_SHORT);
