@@ -16,7 +16,7 @@ class ByteArrayTag : public Tag {
             std::cout << "(ByteArray) " << GetName() << ": " << data.size() << "\n";
             std::cout << std::hex << "(";
             for (size_t i = 0; i < data.size(); ++i) {
-                std::cout << "0x" << static_cast<int>(static_cast<uint8_t>(data[i]));
+                std::cout << "0x" << static_cast<int32_t>(static_cast<uint8_t>(data[i]));
                 if (i < data.size() - 1) {
                     std::cout << ",";
                 }
