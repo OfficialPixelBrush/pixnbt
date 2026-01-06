@@ -1,6 +1,6 @@
 #include "nbt.h"
 
-std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, CompressionAlgorithm algorithm, int level) {
+std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, CompressionAlgorithm algorithm, int32_t level) {
     libdeflate_compressor* compressor = libdeflate_alloc_compressor(level);
     if (!compressor) {
         throw std::runtime_error("Failed to allocate libdeflate compressor");

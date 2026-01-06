@@ -25,5 +25,5 @@ std::shared_ptr<Tag> NbtRead(
 std::vector<uint8_t> NbtCompressData(
     const std::vector<uint8_t>& inputData,
     CompressionAlgorithm algorithm = NBT_GZIP,
-    int level = 6
+    int32_t level = 6
 );

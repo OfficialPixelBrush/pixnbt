@@ -53,7 +53,7 @@ class CompoundTag : public Tag {
             stream << static_cast<uint8_t>(TAG_END);
         }
         void Read(std::istringstream& stream) override {
-            int nTags = 0;
+            int32_t nTags = 0;
             while(true) {
                 uint8_t type;
                 stream.get(reinterpret_cast<char&>(type));

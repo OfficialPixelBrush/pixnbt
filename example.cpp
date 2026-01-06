@@ -1,6 +1,6 @@
 #include "nbt.h"
 
-int main() {
+int32_t main() {
 	auto root = std::make_shared<CompoundTag>("");
 
 	auto test = std::make_shared<StringTag>("LevelName", "world");
