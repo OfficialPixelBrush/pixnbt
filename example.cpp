@@ -1,3 +1,4 @@
+#define NBT_IMPLEMENTATION
 #include "nbt.h"
 
 int32_t main() {
