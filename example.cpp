@@ -2,16 +2,16 @@
 #include "nbt.h"
 
 int32_t main() {
-	auto root = std::make_shared<CompoundTag>("");
+	auto root = std::make_shared<CompoundNbtTag>("");
 
-	auto test = std::make_shared<StringTag>("LevelName", "world");
+	auto test = std::make_shared<StringNbtTag>("LevelName", "world");
 
-	root->Put(std::make_shared<LongTag>("RandomSeed",8703966663084738725));
-	root->Put(std::make_shared<IntTag>("SpawnY", 64));
-	root->Put(std::make_shared<StringTag>("LevelName", "world"));
-	root->Put(std::make_shared<ByteTag>("thunderTime", 26271));
+	root->Put(std::make_shared<LongNbtTag>("RandomSeed",8703966663084738725));
+	root->Put(std::make_shared<IntNbtTag>("SpawnY", 64));
+	root->Put(std::make_shared<StringNbtTag>("LevelName", "world"));
+	root->Put(std::make_shared<ByteNbtTag>("thunderTime", 26271));
 	std::vector<uint8_t> data = {0,1,2,3,4,5,6,8,7};
-	root->Put(std::make_shared<ByteArrayTag>("binData",data));
+	root->Put(std::make_shared<ByteArrayNbtTag>("binData",data));
 
 
 	// Yeet to file
@@ -21,7 +21,7 @@ int32_t main() {
 	writeFile.close();
 	if (root) {
 		std::cout << "--- Written ---" << "\n";
-		root->NbtPrintData();
+		std::cout << *root << "\n";
 	}
 
 	std::ifstream readFile("file.dat", std::ios::binary);
@@ -29,7 +29,7 @@ int32_t main() {
 	readFile.close();
 	if (readOwnRoot) {
 		std::cout << "--- Read ---" << "\n";
-		readOwnRoot->NbtPrintData();
+		std::cout << *readOwnRoot << "\n";
 	}
 
 	return 0;

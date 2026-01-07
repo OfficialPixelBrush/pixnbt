@@ -29,7 +29,7 @@
 #include <cstdint>
 
 // Tag Byte Representation
-enum Tags {
+enum NbtTags {
     TAG_END         =  0,
     TAG_BYTE        =  1,
     TAG_SHORT       =  2,
@@ -44,82 +44,88 @@ enum Tags {
     TAG_INT_ARRAY   = 11
 };
 
-enum CompressionAlgorithm : uint8_t {
+enum NbtCompressionAlgorithm : uint8_t {
     NBT_GZIP,
     NBT_ZLIB,
     NBT_UNCOMPRESSED
 };
 
 // Functions for swapping endianness
-static uint16_t Swap16(uint16_t value);
-static uint32_t Swap32(uint32_t value);
-static uint64_t Swap64(uint64_t value);
+static uint16_t NbtSwap16(uint16_t value);
+static uint32_t NbtSwap32(uint32_t value);
+static uint64_t NbtSwap64(uint64_t value);
 
 // -- Tag base class --
-class Tag {
+class NbtTag {
     private:
         std::string name = "";
+    protected:
+        virtual void Print(std::ostream& os) const {
+            os << "(Tag) " << name << ": RAW";
+        }
     public:
-        virtual ~Tag() = default;  
+        virtual ~NbtTag() = default;  
         virtual uint8_t GetTagId() = 0;
         virtual void Write(std::ostringstream& stream, bool primary = true) = 0;
         virtual void Read(std::istringstream& stream) = 0;
-        virtual void NbtPrintData() {
-            std::cout << "(Tag) " << GetName() << ": " << "RAW" << "\n";
-        };
-        Tag(std::string pName = "") { this->name = pName; }
 
-        std::string GetName() { return name; }
-        Tag* SetName(std::string pName) {
+        friend std::ostream& operator<<(std::ostream& os, const NbtTag& tag) {
+            tag.Print(os);
+            return os;
+        }
+        NbtTag(std::string pName = "") { this->name = pName; }
+
+        std::string GetName() const { return name; }
+        NbtTag* SetName(std::string pName) {
             this->name = pName;
             return this;
         }
 
         void WriteHeader(std::ostringstream& stream) {
             stream << GetTagId();
-            uint16_t nameSize = Swap16(static_cast<uint16_t>(name.size())); 
+            uint16_t nameSize = NbtSwap16(static_cast<uint16_t>(name.size())); 
             stream.write(reinterpret_cast<const char*>(&nameSize), sizeof(nameSize));
             stream << name;
         };
 };
 
-std::shared_ptr<Tag> NewTag(uint8_t type, std::string name = "");
-std::string GetTagName(int8_t type);
+inline std::shared_ptr<NbtTag> NewNbtTag(uint8_t type, std::string name = "");
+inline std::string GetTagName(int8_t type);
 
 // Nbt Read, Write and Compression functions
-void NbtWrite(
+inline static void NbtWrite(
     std::ofstream& stream,
-    std::shared_ptr<Tag> tag,
-    CompressionAlgorithm algorithm = NBT_GZIP
+    std::shared_ptr<NbtTag> tag,
+    NbtCompressionAlgorithm algorithm = NBT_GZIP
 );
-std::shared_ptr<Tag> NbtRead(
+inline static std::shared_ptr<NbtTag> NbtRead(
     std::istream& stream,
-    CompressionAlgorithm algorithm = NBT_GZIP,
+    NbtCompressionAlgorithm algorithm = NBT_GZIP,
     size_t multiplier = 10,
     size_t maxSize = 0
 );
 
-std::vector<uint8_t> NbtCompressData(
+static std::vector<uint8_t> NbtCompressData(
     const std::vector<uint8_t>& inputData,
-    CompressionAlgorithm algorithm = NBT_GZIP,
+    NbtCompressionAlgorithm algorithm = NBT_GZIP,
     int32_t level = 6
 );
 
 // Implementation
 #if defined(NBT_IMPLEMENTATION)
-static uint16_t Swap16(uint16_t value) {
+static uint16_t NbtSwap16(uint16_t value) {
     return  (value >> 8) | 
             (value << 8);
 }
 
-static uint32_t Swap32(uint32_t value) {
+static uint32_t NbtSwap32(uint32_t value) {
     return  ((value >> 24) & 0x000000FF) | 
             ((value >> 8)  & 0x0000FF00) | 
             ((value << 8)  & 0x00FF0000) | 
             ((value << 24) & 0xFF000000);
 }
 
-static uint64_t Swap64(uint64_t value) {
+static uint64_t NbtSwap64(uint64_t value) {
     return  ((value >> 56) & 0x00000000000000FF) |
             ((value >> 40) & 0x000000000000FF00) |
             ((value >> 24) & 0x0000000000FF0000) |
@@ -131,23 +137,30 @@ static uint64_t Swap64(uint64_t value) {
 }
 
 // --- Compound Tags ---
-class CompoundTag : public Tag {
+class CompoundNbtTag : public NbtTag {
     private:
-        std::vector<std::shared_ptr<Tag>> tags;
+        std::vector<std::shared_ptr<NbtTag>> tags;
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Compound) " << GetName() << ": " << tags.size() << "\n";
+            for (const auto& t : tags) {
+                os << "\t" << *t << "\n";
+            }
+        }
     public:
-        CompoundTag(std::string pName) : Tag(pName){};
+        CompoundNbtTag(std::string pName) : NbtTag(pName){};
 
         // TODO: Check if a tag of the same name already exists?
-        void Put(const std::string& pName, std::shared_ptr<Tag> tag) {
+        void Put(const std::string& pName, std::shared_ptr<NbtTag> tag) {
             tag->SetName(pName);
             tags.push_back(tag);
         }
 
-        void Put(std::shared_ptr<Tag> tag) {
+        void Put(std::shared_ptr<NbtTag> tag) {
             tags.push_back(tag);
         }
 
-        std::vector<std::shared_ptr<Tag>> GetTags() {
+        std::vector<std::shared_ptr<NbtTag>> GetTags() {
             return tags;
         }
 
@@ -155,21 +168,14 @@ class CompoundTag : public Tag {
             return tags.size();
         }
         
-        std::shared_ptr<Tag> Get(const std::string& pName) {
+        std::shared_ptr<NbtTag> Get(const std::string& pName) {
             auto it = std::find_if(tags.begin(), tags.end(),
-                [&](const std::shared_ptr<Tag>& tag) { return tag->GetName() == pName; });
+                [&](const std::shared_ptr<NbtTag>& tag) { return tag->GetName() == pName; });
 
             if (it == tags.end()) return nullptr;
-            return *it; // Return the shared_ptr<Tag>
+            return *it; // Return the shared_ptr<NbtTag>
         }
 
-        void NbtPrintData() override {
-            std::cout << "(Compound) " << GetName() << ": " << tags.size() << "\n";
-            for (const auto& t : tags) {
-                std::cout << "\t";
-                t->NbtPrintData();
-            }
-        }
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_COMPOUND);
         }
@@ -192,11 +198,11 @@ class CompoundTag : public Tag {
                 }
                 uint16_t nameSize;
                 stream.read(reinterpret_cast<char*>(&nameSize), sizeof(nameSize));
-                nameSize = Swap16(nameSize);
+                nameSize = NbtSwap16(nameSize);
                 std::string tagName(nameSize, '\0');
                 stream.read(&tagName[0], nameSize);
 
-                auto newTag = NewTag(type, tagName);
+                auto newTag = NewNbtTag(type, tagName);
                 if (!newTag) {
                     break;
                 }
@@ -208,14 +214,21 @@ class CompoundTag : public Tag {
 };
 
 // List Tag
-class ListTag : public Tag {
+class ListNbtTag : public NbtTag {
     private:
-        std::vector<std::shared_ptr<Tag>> tags;
+        std::vector<std::shared_ptr<NbtTag>> tags;
         uint8_t tagType = TAG_END;
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(List) " << GetName() << ": " << tags.size() << "\n";
+            for (const auto& t : tags) {
+                os << "\t" << *t << "\n";
+            }
+        }
     public:
-        ListTag(std::string pName) : Tag(pName){};
+        ListNbtTag(std::string pName) : NbtTag(pName){};
 
-        void Put(std::shared_ptr<Tag> tag) {
+        void Put(std::shared_ptr<NbtTag> tag) {
             // This is the first tag we put in
             if (tags.size() == 0) {
                 tagType = tag->GetTagId();
@@ -223,11 +236,11 @@ class ListTag : public Tag {
             if (tag->GetTagId() == tagType) {
                 tags.push_back(tag);
             } else {
-                std::cout << "Non-matching Tag in list!" << "\n";
+                std::cerr << "Non-matching Tag in list!" << "\n";
             }
         }
 
-        std::vector<std::shared_ptr<Tag>> GetTags() {
+        std::vector<std::shared_ptr<NbtTag>> GetTags() {
             return tags;
         }
 
@@ -235,17 +248,10 @@ class ListTag : public Tag {
             return tags.size();
         }
 
-        std::shared_ptr<Tag> Get(size_t index) {   
+        std::shared_ptr<NbtTag> Get(size_t index) {   
             return tags[index];
         }
-
-        void NbtPrintData() override {
-            std::cout << "(List) " << GetName() << ": " << tags.size() << "\n";
-            for (const auto& t : tags) {
-                std::cout << "\t";
-                t->NbtPrintData();
-            }
-        }
+        
         uint8_t GetTagId() override {
             return  static_cast<uint8_t>(TAG_LIST);
         }
@@ -255,7 +261,7 @@ class ListTag : public Tag {
             }
             // If no tags get added, defaults to value of TAG_END
             stream << static_cast<uint8_t>(tagType);
-            uint32_t writtenSize = Swap32(uint32_t(tags.size()));
+            uint32_t writtenSize = NbtSwap32(uint32_t(tags.size()));
             stream.write(reinterpret_cast<const char*>(&writtenSize), sizeof(writtenSize));
             for (size_t i = 0; i < tags.size(); ++i) {
                 // TODO: Can sometimes use-after-free??
@@ -270,10 +276,10 @@ class ListTag : public Tag {
 
             uint32_t readSize;
             stream.read(reinterpret_cast<char*>(&readSize), sizeof(readSize));  // Read raw bytes for integer
-            readSize = Swap32(readSize);
+            readSize = NbtSwap32(readSize);
 
             for (uint32_t i = 0; i < readSize; i++) {
-                auto newTag = NewTag(type);
+                auto newTag = NewNbtTag(type);
                 newTag->Read(stream);
                 Put(newTag);
             }
@@ -281,14 +287,16 @@ class ListTag : public Tag {
 };
 
 // String Tag
-class StringTag : public Tag {
+class StringNbtTag : public NbtTag {
     private:
         std::string data = "";
-    public:
-        StringTag(std::string pName, std::string pData = "") : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(String) " << GetName() << ": " << data << " (" << data.size() << ")" << "\n";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(String) " << GetName() << ": " << data << " (" << data.size() << ")";
         }
+    public:
+        StringNbtTag(std::string pName, std::string pData = "") : NbtTag(pName){ this->data = pData; }
+
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_STRING);
         }
@@ -296,7 +304,7 @@ class StringTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint16_t writtenData = Swap16(static_cast<uint16_t>(data.size()));
+            uint16_t writtenData = NbtSwap16(static_cast<uint16_t>(data.size()));
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
             stream << data;
         }
@@ -305,7 +313,7 @@ class StringTag : public Tag {
             if (!stream.read(reinterpret_cast<char*>(&stringSize), sizeof(stringSize))) {
                 return;
             }
-            stringSize = Swap16(stringSize);
+            stringSize = NbtSwap16(stringSize);
             std::string tempData(stringSize, '\0');
             
             if (!stream.read(tempData.data(), stringSize)) {
@@ -320,14 +328,16 @@ class StringTag : public Tag {
 };
 
 // Byte Tag
-class ByteTag : public Tag {
+class ByteNbtTag : public NbtTag {
     private:
         int8_t data = 0;
-    public:
-        ByteTag(std::string pName, int8_t pData = 0) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(Byte) " << GetName() << ": " << static_cast<int32_t>(data) << "\n";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Byte) " << GetName() << ": " << static_cast<int32_t>(data);
         }
+    public:
+        ByteNbtTag(std::string pName, int8_t pData = 0) : NbtTag(pName){ this->data = pData; }
+
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_BYTE);
         }
@@ -346,28 +356,30 @@ class ByteTag : public Tag {
 };
 
 // Byte Array Tag
-class ByteArrayTag : public Tag {
+class ByteArrayNbtTag : public NbtTag {
     private:
         std::vector<uint8_t> data;
-    public:
-        ByteArrayTag(std::string pName) : Tag(pName){};
-        // When std::array is passed
-        template <size_t N>
-            ByteArrayTag(std::string pName, const std::array<uint8_t, N>& arr)
-                : Tag(std::move(pName)), data(arr.begin(), arr.end()) {}
-        // When std::vector is passed
-        ByteArrayTag(std::string pName, std::vector<uint8_t> pData) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(ByteArray) " << GetName() << ": " << data.size() << "\n";
-            std::cout << std::hex << "(";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(ByteArray) " << GetName() << ": " << data.size() << "\n";
+            os << std::hex << "(";
             for (size_t i = 0; i < data.size(); ++i) {
-                std::cout << "0x" << static_cast<int32_t>(static_cast<uint8_t>(data[i]));
+                os << "0x" << static_cast<int32_t>(static_cast<uint8_t>(data[i]));
                 if (i < data.size() - 1) {
-                    std::cout << ",";
+                    os << ",";
                 }
             }
-            std::cout << ")" << std::dec << "\n";
+            os << ")" << std::dec;
         }
+    public:
+        ByteArrayNbtTag(std::string pName) : NbtTag(pName){};
+        // When std::array is passed
+        template <size_t N>
+            ByteArrayNbtTag(std::string pName, const std::array<uint8_t, N>& arr)
+                : NbtTag(std::move(pName)), data(arr.begin(), arr.end()) {}
+        // When std::vector is passed
+        ByteArrayNbtTag(std::string pName, std::vector<uint8_t> pData) : NbtTag(pName){ this->data = pData; }
+
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_BYTE_ARRAY);
         }
@@ -375,14 +387,14 @@ class ByteArrayTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint32_t writtenSize = Swap32(static_cast<uint32_t>(data.size()));
+            uint32_t writtenSize = NbtSwap32(static_cast<uint32_t>(data.size()));
             stream.write(reinterpret_cast<const char*>(&writtenSize), sizeof(writtenSize));
             stream.write(reinterpret_cast<const char*>(data.data()), static_cast<int32_t>(data.size()));
         }
         void Read(std::istringstream& stream) override {
             uint32_t readSize;
             stream.read(reinterpret_cast<char*>(&readSize), sizeof(readSize));  // Read raw bytes for integer
-            readSize = Swap32(readSize);
+            readSize = NbtSwap32(readSize);
 
             // Reserve the size beforehand
             data.reserve(readSize);
@@ -399,14 +411,16 @@ class ByteArrayTag : public Tag {
 };
 
 // Short Tag
-class ShortTag : public Tag {
+class ShortNbtTag : public NbtTag {
     private:
         int16_t data = 0;
-    public:
-        ShortTag(std::string pName, int16_t pData = 0) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(Short) " << GetName() << ": " << static_cast<int32_t>(data) << "\n";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Short) " << GetName() << ": " << static_cast<int32_t>(data);
         }
+    public:
+        ShortNbtTag(std::string pName, int16_t pData = 0) : NbtTag(pName){ this->data = pData; }
+        
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_SHORT);
         }
@@ -414,13 +428,13 @@ class ShortTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint16_t writtenData = Swap16(static_cast<uint16_t>(data));
+            uint16_t writtenData = NbtSwap16(static_cast<uint16_t>(data));
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
         void Read(std::istringstream& stream) override {
             uint16_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
-            data = static_cast<int16_t>(Swap16(rawData));
+            data = static_cast<int16_t>(NbtSwap16(rawData));
         }
         int16_t GetData() {
             return data;
@@ -428,14 +442,16 @@ class ShortTag : public Tag {
 };
 
 // Integer Tag
-class IntTag : public Tag {
+class IntNbtTag : public NbtTag {
     private:
-    int32_t data = 0;
-    public:
-        IntTag(std::string pName, int32_t pData = 0) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(Int) " << GetName() << ": " << static_cast<int32_t>(data) << "\n";
+        int32_t data = 0;
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Int) " << GetName() << ": " << static_cast<int32_t>(data);
         }
+    public:
+        IntNbtTag(std::string pName, int32_t pData = 0) : NbtTag(pName){ this->data = pData; }
+        
         uint8_t GetTagId() override {
             return  static_cast<uint8_t>(TAG_INT);
         }
@@ -443,13 +459,13 @@ class IntTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint32_t writtenData = Swap32(static_cast<uint32_t>(data));
+            uint32_t writtenData = NbtSwap32(static_cast<uint32_t>(data));
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
         void Read(std::istringstream& stream) override {
             uint32_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
-            data = static_cast<int32_t>(Swap32(rawData));
+            data = static_cast<int32_t>(NbtSwap32(rawData));
         }
         int32_t GetData() {
             return data;
@@ -457,14 +473,16 @@ class IntTag : public Tag {
 };
 
 // Long Tag
-class LongTag : public Tag {
+class LongNbtTag : public NbtTag {
     private:
         int64_t data = 0;
-    public:
-        LongTag(std::string pName, int64_t pData = 0) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(Long) " << GetName() << ": " << data << "\n";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Long) " << GetName() << ": " << data;
         }
+    public:
+        LongNbtTag(std::string pName, int64_t pData = 0) : NbtTag(pName){ this->data = pData; }
+        
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_LONG);
         }
@@ -472,13 +490,13 @@ class LongTag : public Tag {
             if (primary) {
                 WriteHeader(stream);
             }
-            uint64_t writtenData = Swap64(static_cast<uint64_t>(data));
+            uint64_t writtenData = NbtSwap64(static_cast<uint64_t>(data));
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
         void Read(std::istringstream& stream) override {
             uint64_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
-            data = static_cast<int64_t>(Swap64(rawData));
+            data = static_cast<int64_t>(NbtSwap64(rawData));
         }
         int64_t GetData() {
             return data;
@@ -486,14 +504,16 @@ class LongTag : public Tag {
 };
 
 // Float Tag
-class FloatTag : public Tag {
+class FloatNbtTag : public NbtTag {
     private:
         float data = 0;
-    public:
-        FloatTag(std::string pName, float pData = 0) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(Float) " << GetName() << ": " << std::fixed << data << std::dec << "\n";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Float) " << GetName() << ": " << std::fixed << data << std::dec;
         }
+    public:
+        FloatNbtTag(std::string pName, float pData = 0) : NbtTag(pName){ this->data = pData; }
+        
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_FLOAT);
         }
@@ -502,13 +522,13 @@ class FloatTag : public Tag {
                 WriteHeader(stream);
             }
             uint32_t writtenData = std::bit_cast<uint32_t>(data);
-            writtenData = Swap32(writtenData);  // Swap bytes if needed
+            writtenData = NbtSwap32(writtenData);  // Swap bytes if needed
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
         void Read(std::istringstream& stream) override {
             uint32_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
-            rawData = Swap32(rawData);
+            rawData = NbtSwap32(rawData);
             data = std::bit_cast<float>(rawData);
         }
         float GetData() {
@@ -517,14 +537,16 @@ class FloatTag : public Tag {
 };
 
 // Double Tag
-class DoubleTag : public Tag {
+class DoubleNbtTag : public NbtTag {
     private:
         double data = 0;
-    public:
-        DoubleTag(std::string pName, double pData = 0.0) : Tag(pName){ this->data = pData; }
-        void NbtPrintData() override {
-            std::cout << "(Double) " << GetName() << ": " << std::fixed << data << std::dec << "\n";
+    protected:
+        void Print(std::ostream& os) const override {
+            os << "(Double) " << GetName() << ": " << std::fixed << data << std::dec;
         }
+    public:
+        DoubleNbtTag(std::string pName, double pData = 0.0) : NbtTag(pName){ this->data = pData; }
+        
         uint8_t GetTagId() override {
             return static_cast<uint8_t>(TAG_DOUBLE);
         }
@@ -533,13 +555,13 @@ class DoubleTag : public Tag {
                 WriteHeader(stream);
             }
             uint64_t writtenData = std::bit_cast<uint64_t>(data);
-            writtenData = Swap64(writtenData);  // Swap bytes if needed
+            writtenData = NbtSwap64(writtenData);  // Swap bytes if needed
             stream.write(reinterpret_cast<const char*>(&writtenData), sizeof(writtenData));
         }
         void Read(std::istringstream& stream) override {
             uint64_t rawData;
             stream.read(reinterpret_cast<char*>(&rawData), sizeof(rawData));  // Read raw bytes for integer
-            rawData = Swap64(rawData);
+            rawData = NbtSwap64(rawData);
             data = std::bit_cast<double>(rawData);
         }
         double GetData() {
@@ -547,8 +569,64 @@ class DoubleTag : public Tag {
         }
 };
 
+// -- Shared Functionality for all Tags
+inline std::string GetTagName(int8_t type) {
+    switch(type) {
+        case TAG_END:
+            return "TAG_End";
+        case TAG_BYTE:
+            return "Tag_Byte";
+        case TAG_SHORT:
+            return "TAG_Short";
+        case TAG_INT:
+            return "TAG_Int";
+        case TAG_LONG:
+            return "TAG_Long";
+        case TAG_FLOAT:
+            return "TAG_Float";
+        case TAG_BYTE_ARRAY:
+            return "TAG_Byte_Array";
+        case TAG_INT_ARRAY:
+            return "TAG_Int_Array";
+        case TAG_STRING:
+            return "TAG_String";
+        case TAG_LIST:
+            return "TAG_List";
+        case TAG_COMPOUND:
+            return "TAG_Compound";
+    }
+    return "UNKNOWN";
+}
+
+inline std::shared_ptr<NbtTag> NewNbtTag(uint8_t type, std::string name) {
+    switch(type) {
+        case TAG_BYTE:
+            return std::make_shared<ByteNbtTag>(name);
+        case TAG_SHORT:
+            return std::make_shared<ShortNbtTag>(name);
+        case TAG_INT:
+            return std::make_shared<IntNbtTag>(name);
+        case TAG_LONG:
+            return std::make_shared<LongNbtTag>(name);
+        case TAG_FLOAT:
+            return std::make_shared<FloatNbtTag>(name);
+        case TAG_DOUBLE:
+            return std::make_shared<DoubleNbtTag>(name);
+        case TAG_BYTE_ARRAY:
+            return std::make_shared<ByteArrayNbtTag>(name);
+        case TAG_STRING:
+            return std::make_shared<StringNbtTag>(name);
+        case TAG_LIST:
+            return std::make_shared<ListNbtTag>(name);
+        case TAG_COMPOUND:
+            return std::make_shared<CompoundNbtTag>(name);
+        default:
+            return nullptr;
+    }
+}
+
 // --- Generic NBT Read/Write Stuff ---
-std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, CompressionAlgorithm algorithm, int32_t level) {
+std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, NbtCompressionAlgorithm algorithm, int32_t level) {
     libdeflate_compressor* compressor = libdeflate_alloc_compressor(level);
     if (!compressor) {
         throw std::runtime_error("Failed to allocate libdeflate compressor");
@@ -590,63 +668,7 @@ std::vector<uint8_t> NbtCompressData(const std::vector<uint8_t>& inputData, Comp
     return compressedData;
 }
 
-// -- Shared Functionality for all Tags
-std::string GetTagName(int8_t type) {
-    switch(type) {
-        case TAG_END:
-            return "TAG_End";
-        case TAG_BYTE:
-            return "Tag_Byte";
-        case TAG_SHORT:
-            return "TAG_Short";
-        case TAG_INT:
-            return "TAG_Int";
-        case TAG_LONG:
-            return "TAG_Long";
-        case TAG_FLOAT:
-            return "TAG_Float";
-        case TAG_BYTE_ARRAY:
-            return "TAG_Byte_Array";
-        case TAG_INT_ARRAY:
-            return "TAG_Int_Array";
-        case TAG_STRING:
-            return "TAG_String";
-        case TAG_LIST:
-            return "TAG_List";
-        case TAG_COMPOUND:
-            return "TAG_Compound";
-    }
-    return "UNKNOWN";
-}
-
-std::shared_ptr<Tag> NewTag(uint8_t type, std::string name) {
-    switch(type) {
-        case TAG_BYTE:
-            return std::make_shared<ByteTag>(name);
-        case TAG_SHORT:
-            return std::make_shared<ShortTag>(name);
-        case TAG_INT:
-            return std::make_shared<IntTag>(name);
-        case TAG_LONG:
-            return std::make_shared<LongTag>(name);
-        case TAG_FLOAT:
-            return std::make_shared<FloatTag>(name);
-        case TAG_DOUBLE:
-            return std::make_shared<DoubleTag>(name);
-        case TAG_BYTE_ARRAY:
-            return std::make_shared<ByteArrayTag>(name);
-        case TAG_STRING:
-            return std::make_shared<StringTag>(name);
-        case TAG_LIST:
-            return std::make_shared<ListTag>(name);
-        case TAG_COMPOUND:
-            return std::make_shared<CompoundTag>(name);
-        default:
-            return nullptr;
-    }
-}
-
-void NbtWrite(std::ofstream& stream, std::shared_ptr<Tag> tag, CompressionAlgorithm algorithm) {
+inline void NbtWrite(std::ofstream& stream, std::shared_ptr<NbtTag> tag, NbtCompressionAlgorithm algorithm) {
     if (!stream.is_open()) {
         std::cerr << "Error: Failed to open stream or invalid stream!" << "\n";
         return;
@@ -666,7 +688,7 @@ void NbtWrite(std::ofstream& stream, std::shared_ptr<Tag> tag, CompressionAlgori
     }
 }
 
-std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorithm, size_t multiplier, size_t maxSize) {
+inline std::shared_ptr<NbtTag> NbtRead(std::istream& stream, NbtCompressionAlgorithm algorithm, size_t multiplier, size_t maxSize) {
     // Open the file in binary mode
     if (!stream) {
         std::cerr << "Error: Failed to open stream or invalid stream!" << "\n";
@@ -738,7 +760,7 @@ std::shared_ptr<Tag> NbtRead(std::istream& stream, CompressionAlgorithm algorith
     std::string_view decompressed_str(reinterpret_cast<const char*>(decompressed_data.data()), decompressed_data.size());
     std::istringstream iss(std::string(decompressed_str), std::ios::binary);
 
-	auto overRoot = std::make_shared<CompoundTag>("");
+	auto overRoot = std::make_shared<CompoundNbtTag>("");
     overRoot->Read(iss);
     auto root = *overRoot->GetTags().begin();
     if (!root) {
