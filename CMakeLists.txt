@@ -16,9 +16,6 @@ include_directories(
 
 add_executable(
     pixnbt
-    
-    tags/tag.cpp
-    nbt.cpp
     example.cpp
 )
 
@@ -38,6 +35,7 @@ target_link_libraries(
 )
 
 target_compile_options(pixnbt PRIVATE
+    -ffunction-sections -fdata-sections
     -Wall
     -Wextra
     -Wpedantic           # Enforce strict ISO compliance
@@ -53,4 +51,8 @@ target_compile_options(pixnbt PRIVATE
     -Wnull-dereference
     -Wdouble-promotion
     -Wformat=2
+)
+
+target_link_options(pixnbt PRIVATE
+    -Wl,--as-needed,--gc-sections
 )
