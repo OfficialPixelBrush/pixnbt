@@ -26,6 +26,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
+#include <algorithm>
 #include <cstdint>
 
 // Tag Byte Representation
